@@ -1,4 +1,4 @@
 .env
-
+gcp-service-key.json
 __pycache__/
 *.pyc
