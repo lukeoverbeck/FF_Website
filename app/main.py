@@ -1,11 +1,19 @@
-from typing import Union
 from google.cloud import bigquery
 from fastapi import FastAPI
-from schemas import LeagueSettings, LeagueWinners, MatchupBar, MatchupDropdown, RichRosterRecord, RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry
+from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
 client = bigquery.Client()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], # Vite's default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
