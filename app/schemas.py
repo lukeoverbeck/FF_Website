@@ -25,6 +25,8 @@ class LeagueWinners(BigQueryModel):
 class MatchupBar(BigQueryModel):
     season: int
     week: int
+    user_id: int
+    opponent_id: int
     user_team_name: str
     opponent_team_name: str
     user_score: float
@@ -53,11 +55,13 @@ class RichRoster(BigQueryModel):
     h2h_losses: int
     median_wins: int
     median_losses: int
+    total_wins: int
+    total_losses: int
     h2h_ranking: int
     points_for: float
     points_against: float
     # If the column is empty in BigQuery, the API returns [] instead of null
-    player_nickname_details: list[RichRosterRecord] = Field(default_factory=list)
+    player_details: list[RichRosterRecord] = Field(default_factory=list)
 
 # Home dashboard model
 class HomeDashboard(BigQueryModel):
@@ -66,13 +70,17 @@ class HomeDashboard(BigQueryModel):
     # List because home page always shows all winners
     league_winners: List[LeagueWinners]
 
-# Helper for UserDashboard to put matchup dropdowns for both teams together
+# Helper for MatchupEntry to put matchup dropdowns for both teams together
 class MatchupComparison(BigQueryModel):
     user_team: List[MatchupDropdown]
     opponent_team: List[MatchupDropdown]
 
+# Helper for UserDashboard to put matchup bar and matchup dropdown together for each matchup
+class MatchupEntry(BigQueryModel):
+    summary: MatchupBar
+    details: MatchupComparison
+
 # User dashboard model
 class UserDashboard(BigQueryModel):
     roster_info: RichRoster
-    matchup_bar: List[MatchupBar]
-    matchup_dropdown: MatchupComparison
+    matchups: list[MatchupEntry]
