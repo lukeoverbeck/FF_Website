@@ -1,0 +1,106 @@
+/* Not shadcn/ui */
+@import "tailwindcss"; /* Load entire utility engine */
+@plugin "tailwindcss-animate"; /* Provides animation classes that make shadcn components feel smooth */
+@custom-variant dark (&:is(.dark *)); /* Makes it so that any element with the .dark class will apply dark mode styles to all its children. This is useful for components that need to support both light and dark themes. */
+
+:root {
+  /* Shadcn Core Variables */
+  /* OKLCH Format: Lightness (0-1), Chroma (Intensity), Hue (0-360) */
+  /* Semantic Naming: Variables are named by their PURPOSE, not their color value. */
+
+  --background: oklch(1 0 0); /* The main page surface color */
+  --foreground: oklch(
+    0.145 0 0
+  ); /* The default text color sitting on the background */
+
+  --card: oklch(1 0 0); /* Surface color for card components */
+  --card-foreground: oklch(
+    0.145 0 0
+  ); /* Text color specifically for inside cards */
+
+  --popover: oklch(1 0 0); /* Background for tooltips, dropdowns, and menus */
+  --popover-foreground: oklch(0.145 0 0);
+
+  --primary: oklch(
+    0.205 0 0
+  ); /* Brand color used for main actions (Buttons, highlights) */
+  --primary-foreground: oklch(
+    0.985 0 0
+  ); /* Contrast color used for text/icons on top of primary bg */
+
+  --secondary: oklch(
+    0.97 0 0
+  ); /* Less prominent background for subtle actions */
+  --secondary-foreground: oklch(0.205 0 0);
+
+  --muted: oklch(
+    0.97 0 0
+  ); /* Used for "empty" states or secondary backgrounds */
+  --muted-foreground: oklch(
+    0.556 0 0
+  ); /* "Quiet" text for descriptions or timestamps */
+
+  --accent: oklch(0.97 0 0); /* Used for hover states on buttons/links */
+  --accent-foreground: oklch(0.205 0 0);
+
+  --destructive: oklch(
+    0.577 0.245 27.325
+  ); /* Error/Danger color (e.g., Delete buttons) */
+  --destructive-foreground: oklch(0.985 0 0);
+
+  --border: oklch(
+    0.922 0 0
+  ); /* Default color for separators and element outlines */
+  --input: oklch(0.922 0 0); /* Specifically for form input borders */
+  --ring: oklch(0.708 0 0); /* The focus "halo" color for accessibility */
+  --radius: 0.625rem; /* Global corner roundness; change here to update the whole app */
+}
+
+.dark {
+  /* Dark Mode Overrides: These variables swap values when the .dark class is active */
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --border: oklch(0.269 0 0);
+}
+
+@theme inline {
+  /* @theme inline: Acts as a bridge, telling Tailwind to generate utilities from these variables. */
+  --font-sans: "Geist", ui-sans-serif, system-ui;
+
+  /* Mapping shadcn variables to Tailwind classes */
+  /*
+    Backgrounds: bg-primary (Fills the button/div).
+    Text: text-primary (Colors the font).
+    Borders: border-primary (The solid line around the edge).
+    Rings: ring-primary (The focus halo).
+    Dividers: divide-primary (Lines between list items).
+    Outline: outline-primary (The browser's native focus ring).
+    Opacity: bg-primary/50, text-primary/20 (Using the slash to make it see-through).
+  */
+
+  /* Each line below automatically creates text-*, bg-*, border-*, and ring-* utilities */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+}
+
+@layer base {
+  /* Applies default styles to standard HTML elements before you add any classes */
+  * {
+    @apply border-border; /* Forces every element to use the theme's border color by default */
+  }
+  body {
+    /* Sets the foundation: correct background, primary text color, and theme font */
+    @apply bg-background text-foreground font-sans;
+  }
+}
