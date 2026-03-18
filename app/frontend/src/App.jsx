@@ -1,16 +1,43 @@
 import { Routes, Route } from "react-router-dom";
-import "./App.css";
 import { Button } from "@/components/ui/button";
 import Navbar from "./components/Navbar";
+import SettingsCard from "./components/SettingsCard";
 
 // 1. Define your Page components
 const Home = () => (
-  <div className="bg-blue-600 text-white p-10 rounded-xl m-6">
-    <h1 className="text-4xl font-bold">Tailwind is live</h1>
-    <Button className="mt-4" variant="outline">
-      Click me
-    </Button>
-  </div>
+  <main className="min-h-screen bg-slate-100">
+    {/* This div keeps everything centered and bounded */}
+    <div className="container mx-auto p-6 space-y-8">
+      <div className="bg-blue-600 text-white p-10 rounded-xl shadow-lg">
+        <h1 className="text-4xl font-bold">League Dashboard</h1>
+        <p className="mt-2 opacity-90">Welcome back, Commissioner Luke.</p>
+      </div>
+
+      {/* Eventually pull from BigQuery */}
+      <div className="grid grid-cols-12 gap-6">
+        <SettingsCard
+          className="col-span-12 md:col-span-3"
+          settingsName="Number of Teams"
+          settingsContent="12"
+        />
+        <SettingsCard
+          className="col-span-12 md:col-span-3"
+          settingsName="Roster Type"
+          settingsContent="Keeper"
+        />
+        <SettingsCard
+          className="col-span-12 md:col-span-3"
+          settingsName="Scoring System"
+          settingsContent="Half-PPR"
+        />
+        <SettingsCard
+          className="col-span-12 md:col-span-3"
+          settingsName="Waiver System"
+          settingsContent="FAAB ($100)"
+        />
+      </div>
+    </div>
+  </main>
 );
 
 function App() {
