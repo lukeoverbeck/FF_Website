@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "./components/Navbar";
 import SettingsCard from "./components/SettingsCard";
+import WinnerCard from "./components/WinnerCard";
 
 // 1. Define your Page components
 const Home = () => (
@@ -35,6 +36,32 @@ const Home = () => (
           settingsName="Waiver System"
           settingsContent="FAAB ($100)"
         />
+      </div>
+      <div className="flex flex-col gap-5 max-w-md mx-auto">
+        <WinnerCard
+          className=""
+          winnerDisplayName="Luke Overbeck"
+          winnerTeamName="Critical Chase Theory"
+          winnerYear="2025"
+        ></WinnerCard>
+        <WinnerCard
+          className=""
+          winnerDisplayName="Luke Overbeck"
+          winnerTeamName="Critical Chase Theory"
+          winnerYear="2025"
+        ></WinnerCard>
+        <WinnerCard
+          className=""
+          winnerDisplayName="Luke Overbeck"
+          winnerTeamName="Critical Chase Theory"
+          winnerYear="2025"
+        ></WinnerCard>
+        <WinnerCard
+          className=""
+          winnerDisplayName="Luke Overbeck"
+          winnerTeamName="Critical Chase Theory"
+          winnerYear="2025"
+        ></WinnerCard>
       </div>
     </div>
   </main>
