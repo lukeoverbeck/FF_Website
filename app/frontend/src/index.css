@@ -67,6 +67,39 @@
   --border: oklch(0.269 0 0);
 }
 
+@theme {
+  /* 1. Define the Keyframes */
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+}
+
+/* 2. Create the Utilities (This is the part V4 needs) */
+@utility animate-accordion-down {
+  animation: accordion-down 0.3s ease-out;
+}
+
+@utility animate-accordion-up {
+  animation: accordion-up 0.3s ease-out;
+}
+
 @theme inline {
   /* @theme inline: Acts as a bridge, telling Tailwind to generate utilities from these variables. */
   --font-sans: "Geist", ui-sans-serif, system-ui;

@@ -4,10 +4,74 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "./ui/accordion";
-// import MatchupDropdown from "./MatchupDropdown";
+import MatchupDropdown from "./MatchupDropdown";
 
 const MatchupBar = ({ userScore, opponentScore, opponentName, week }) => {
   const isWin = userScore > opponentScore;
+  const players = [
+    {
+      pos: "QB",
+      name: "Patrick Mahomes",
+      points: 24.2,
+      team: "KC",
+    },
+    {
+      pos: "WR",
+      name: "Ja'Marr Chase",
+      points: 24.2,
+      team: "CIN",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+    {
+      pos: "RB",
+      name: "Derrick Henry",
+      points: 24.2,
+      team: "BAL",
+      start_pos: "STR",
+    },
+  ];
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -15,7 +79,7 @@ const MatchupBar = ({ userScore, opponentScore, opponentName, week }) => {
         value="matchup-1"
         className="border rounded-xl bg-white shadow-sm overflow-hidden"
       >
-        <AccordionTrigger className="py-6 px-6">
+        <AccordionTrigger className="hover:no-underline py-6 px-6">
           <div className="flex items-center justify-between w-full pr-4">
             {/* Week + W/L Section */}
             <div className="flex items-center justify-center gap-10">
@@ -54,9 +118,11 @@ const MatchupBar = ({ userScore, opponentScore, opponentName, week }) => {
           </div>
         </AccordionTrigger>
 
-        <AccordionContent className="border-t bg-slate-50/50">
+        <AccordionContent className="overflow-hidden">
           {/* Pass the player information to the MatchupDropdown component here */}
-          <h1>yo</h1>
+          <div className="border-t bg-slate-50/50 p-6">
+            <MatchupDropdown players={players} />
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
