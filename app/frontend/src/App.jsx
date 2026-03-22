@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import User from "./pages/User";
 
 function App() {
   return (
@@ -12,8 +13,7 @@ function App() {
         <Routes>
           {/* path="/" to Home page */}
           <Route path="/" element={<Home />} />
-
-          {/* path="/user_dashboard" -- future path to user dashboard page */}
+          <Route path="/user" element={<User />} />
           {/* <Route path="/standings" element={<Standings />} /> */}
         </Routes>
       </main>
