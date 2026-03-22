@@ -50,9 +50,7 @@ const MatchupDropdown = ({ players }) => {
                 {/* Player Name*/}
                 <TableCell className="py-4">
                   {isEmpty ? (
-                    <span className="text-slate-300 italic text-sm">
-                      Empty Slot
-                    </span>
+                    <span className="text-slate-300 italic text-sm">None</span>
                   ) : (
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm text-slate-700 gap-5">
