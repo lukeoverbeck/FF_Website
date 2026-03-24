@@ -99,7 +99,7 @@ const MatchupDropdown = ({ players }) => {
                   ) : (
                     <div className="flex items-center gap-2 justify-end w-full">
                       <span className="text-[10px] text-muted-foreground font-medium uppercase">
-                        {player.team}-{player.pos}
+                        {player.pos}-{player.team}
                       </span>
                       <span className="font-semibold text-sm text-slate-700">
                         {player.name}
