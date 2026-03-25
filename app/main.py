@@ -64,6 +64,7 @@ async def get_home_dashboard(season: int):
     # Query 2: League Winners (List of Objects)
     league_winners_query = """
         SELECT * FROM `fantasy-league-data-engine.gold_layer.league_winners`
+        ORDER BY season DESC
     """
     league_winners_res = client.query(league_winners_query, job_config=job_config).result()
     league_winners = [row for row in league_winners_res]

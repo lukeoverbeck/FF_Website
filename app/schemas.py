@@ -43,8 +43,8 @@ class MatchupDropdown(BigQueryModel):
 
 # Helper for RichRoster to get player nickname details
 class RichRosterRecord(BigQueryModel):
-    full_name: str
-    nickname: str
+    full_name: Optional[str]
+    nickname: Optional[str]
 
 # General gold layer model
 class RichRoster(BigQueryModel):
