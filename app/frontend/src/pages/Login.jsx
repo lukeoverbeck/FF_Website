@@ -15,8 +15,12 @@ const LoginPage = () => {
     });
 
     const data = await res.json();
+    // const text = await res.text();
+    // console.log("status:", res.status);
+    // console.log("raw response:", text);
 
     if (res.ok) {
+      localStorage.setItem("token", data.token);
       navigate("/home");
     } else {
       setError(data.detail);
