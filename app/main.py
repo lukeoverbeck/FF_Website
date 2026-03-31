@@ -1,7 +1,8 @@
 from google.cloud import bigquery
-from fastapi import FastAPI
-from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry
+from fastapi import FastAPI, HTTPException
+from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest
 from fastapi.middleware.cors import CORSMiddleware
+import bcrypt
 
 app = FastAPI()
 client = bigquery.Client()
@@ -163,3 +164,32 @@ async def get_user_dashboard(season: int, roster_id: int):
         "roster_info": rich_roster,
         "matchups": combined_matchups
     }
+
+@app.post("/api/login")
+def login(body: LoginRequest):
+    query = """
+        SELECT password_hash
+        FROM `fantasy-league-data-engine.gold_layer.users`
+        WHERE username = @username
+        LIMIT 1
+    """
+
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("username", "STRING", body.username)
+        ]
+    )
+
+    results = client.query(query, job_config=job_config).result()
+    rows = list(results)
+
+    if not rows:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    password_bytes = body.password.encode("utf-8")
+    hash_from_db = rows[0]["password_hash"].encode("utf-8")
+
+    if not bcrypt.checkpw(password_bytes, hash_from_db):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return { "success": True }

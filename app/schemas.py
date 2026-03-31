@@ -84,3 +84,7 @@ class MatchupEntry(BigQueryModel):
 class UserDashboard(BigQueryModel):
     roster_info: RichRoster
     matchups: list[MatchupEntry]
+
+class LoginRequest(BigQueryModel):
+    username: str
+    password: str
