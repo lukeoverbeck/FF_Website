@@ -6,72 +6,15 @@ import {
 } from "./ui/accordion";
 import MatchupDropdown from "./MatchupDropdown";
 
-const MatchupBar = ({ userScore, opponentScore, opponentName, week }) => {
+const MatchupBar = ({
+  userScore,
+  opponentScore,
+  opponentName,
+  week,
+  userPlayers,
+  opponentPlayers,
+}) => {
   const isWin = userScore > opponentScore;
-  const players = [
-    {
-      pos: "QB",
-      name: "Patrick Mahomes",
-      points: 24.2,
-      team: "KC",
-    },
-    {
-      pos: "WR",
-      name: "Ja'Marr Chase",
-      points: 24.2,
-      team: "CIN",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-    {
-      pos: "RB",
-      name: "Derrick Henry",
-      points: 24.2,
-      team: "BAL",
-      start_pos: "STR",
-    },
-  ];
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -121,7 +64,10 @@ const MatchupBar = ({ userScore, opponentScore, opponentName, week }) => {
         <AccordionContent className="overflow-hidden">
           {/* Pass the player information to the MatchupDropdown component here */}
           <div className="border-t bg-slate-50/50 p-6">
-            <MatchupDropdown players={players} />
+            <MatchupDropdown
+              userPlayers={userPlayers}
+              opponentPlayers={opponentPlayers}
+            />
           </div>
         </AccordionContent>
       </AccordionItem>
