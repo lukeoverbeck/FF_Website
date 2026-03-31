@@ -39,7 +39,7 @@ class MatchupDropdown(BigQueryModel):
     points: float
     position: str
     team: str
-    is_starter: bool
+    fantasy_position: str
 
 # Helper for RichRoster to get player nickname details
 class RichRosterRecord(BigQueryModel):
@@ -57,7 +57,7 @@ class RichRoster(BigQueryModel):
     median_losses: int
     total_wins: int
     total_losses: int
-    h2h_ranking: int
+    regular_season_rank: int
     points_for: float
     points_against: float
     # If the column is empty in BigQuery, the API returns [] instead of null

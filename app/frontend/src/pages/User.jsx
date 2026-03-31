@@ -1,64 +1,119 @@
 import MatchupBar from "../components/MatchupBar";
 import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
+import { useState, useEffect } from "react";
+import { cn } from "../lib/utils";
+
+const SkeletonCard = ({ className }) => (
+  <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
+);
 
 const User = () => {
-  // 1. Define your data (this would eventually come from an API or DB)
-  const matchups = [
-    {
-      week: 1,
-      userScore: 85,
-      opponentScore: 92,
-      opponentName: "Default Dan",
-    },
-    {
-      week: 2,
-      userScore: 110,
-      opponentScore: 105,
-      opponentName: "Gridiron Greats",
-    },
-    {
-      week: 3,
-      userScore: 95,
-      opponentScore: 95,
-      opponentName: "Tie Fighter",
-    },
-    {
-      week: 4,
-      userScore: 72,
-      opponentScore: 88,
-      opponentName: "Blitz King",
-    },
-    {
-      week: 5,
-      userScore: 10,
-      opponentScore: 10,
-      opponentName: "Critical Chase Theory",
-    },
-  ];
+  const [userInfo, setUserInfo] = useState([]);
+  const [userStats, setUserStats] = useState([]);
+  const [matchupsData, setMatchupsData] = useState([]);
+  const [userPlayerData, setUserPlayerData] = useState([]);
+  const [opponentPlayerData, setOpponentPlayerData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user_dashboard/2025/1")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        const user = data.roster_info;
+        setUserInfo({
+          id: user.display_name, // Not really necessary here
+          teamName: user.team_name,
+          displayName: user.display_name,
+          playerNicknames: user.player_details || [],
+        });
+        setUserStats({
+          id: user.display_name, // Not really necessary here
+          year: user.season,
+          totalRecord: `${user.total_wins}-${user.total_losses}`,
+          headToHeadRecord: `${user.head_to_head_wins}-${user.head_to_head_losses}`,
+          leagueMedianRecord: `${user.median_wins}-${user.median_losses}`,
+          regularSeasonRank: user.regular_season_rank,
+          pointsFor: user.points_for,
+          pointsAgainst: user.points_against,
+        });
+
+        console.log("Raw Matchups:", data.matchups);
+
+        const formattedMatchupsArray = data.matchups.map((matchup) => {
+          const innerUserMatchup = matchup.details.user_team.map((player) => {
+            return {
+              pos: player.position,
+              name: player.full_name,
+              points: player.points,
+              team: player.team,
+              fantasy_pos: player.fantasy_position,
+            };
+          });
+
+          const innerOpponentMatchup = matchup.details.opponent_team.map(
+            (player) => {
+              return {
+                pos: player.position,
+                name: player.full_name,
+                points: player.points,
+                team: player.team,
+                fantasy_pos: player.fantasy_position,
+              };
+            }
+          );
+
+          matchup = matchup.summary;
+          return {
+            id: matchup.week,
+            week: matchup.week,
+            userScore: matchup.user_score,
+            opponentScore: matchup.opponent_score,
+            opponentName: matchup.opponent_team_name,
+            userPlayers: innerUserMatchup,
+            opponentPlayers: innerOpponentMatchup,
+          };
+        });
+
+        console.log("Formatted matchups:", formattedMatchupsArray);
+
+        setMatchupsData(formattedMatchupsArray);
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <main className="min-h-screen bg-slate-100">
       <div className="container mx-auto p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <UserInfo
-            teamName="Critical Chase Theory"
-            displayName="Luke Overbeck"
-            playerNicknames={[
-              { player: "Justin Jefferson", nickname: "The Flash" },
-              { player: "AJ Brown", nickname: "Lord and Savior" },
-            ]}
-            awardsWon={[{ award: "Manager of the Year", year: "2025" }]}
-          ></UserInfo>
-          <UserStats
-            year={2025}
-            totalRecord="21-7"
-            headToHeadRecord="10-4"
-            leagueMedianRecord="11-3"
-            regularSeasonRank="5th"
-            pointsFor={1500}
-            pointsAgainst={1200}
-          ></UserStats>
+          {isLoading ? (
+            <>
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+            </>
+          ) : (
+            <>
+              {/* One Fragment to rule them both! */}
+              {userInfo && (
+                <UserInfo
+                  teamName={userInfo.teamName}
+                  displayName={userInfo.displayName}
+                  playerNicknames={userInfo.playerNicknames}
+                />
+              )}
+
+              <UserStats
+                year={userStats.year}
+                totalRecord={userStats.totalRecord}
+                headToHeadRecord={userStats.headToHeadRecord}
+                leagueMedianRecord={userStats.leagueMedianRecord}
+                regularSeasonRank={userStats.regularSeasonRank}
+                pointsFor={userStats.pointsFor}
+                pointsAgainst={userStats.pointsAgainst}
+              />
+            </>
+          )}
         </div>
 
         <div>
@@ -68,13 +123,10 @@ const User = () => {
         </div>
 
         {/* 2. Map through the matchups array */}
-        {matchups.map((match) => (
+        {matchupsData.map((matchup) => (
           <MatchupBar
-            key={match.week} // Always use a unique key for list items
-            week={match.week}
-            userScore={match.userScore}
-            opponentScore={match.opponentScore}
-            opponentName={match.opponentName}
+            key={matchup.id} // Always use a unique key for list items
+            {...matchup} // Spread the matchup properties as props to MatchupBar
           />
         ))}
       </div>

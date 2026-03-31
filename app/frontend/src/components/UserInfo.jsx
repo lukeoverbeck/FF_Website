@@ -17,7 +17,7 @@ const UserInfo = ({
   ...props
 }) => {
   const formattedNicknames = playerNicknames
-    .map((item) => `${item.nickname} (${item.player})`)
+    .map((item) => `${item.nickname} (${item.full_name})`)
     .join(", ");
 
   const formattedAwards = awardsWon

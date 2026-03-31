@@ -37,6 +37,13 @@ const UserStats = ({
             <span className="font-bold">Season Rank</span>
             <span className="text-2xl font-black text-slate-800">
               {regularSeasonRank}
+              {regularSeasonRank === 1
+                ? "st"
+                : regularSeasonRank === 2
+                ? "nd"
+                : regularSeasonRank === 3
+                ? "rd"
+                : "th"}
             </span>
           </div>
           <div className="flex flex-col justify-between items-center border-l pl-4">

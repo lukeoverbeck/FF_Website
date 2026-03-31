@@ -8,7 +8,7 @@ from datetime import datetime
 from helpers.utils import fetch_sleeper_league, load_to_bronze
 
 TABLE_NAME = "matchups"
-SEASON = 2022
+SEASON = 2025
 WEEKS = range(1, 15)
 
 
@@ -17,20 +17,21 @@ def main():
         print(f"--- Processing Week {week} ---")
         try:
             raw = fetch_sleeper_league(f"matchups/{week}", SEASON)
+            print(raw)
 
-            rows = [
-                {
-                    "timestamp": str(datetime.now()),
-                    "week": week,
-                    "season": SEASON,
-                    "raw_json": record,
-                }
-                for record in raw
-            ]
+            # rows = [
+            #     {
+            #         "timestamp": str(datetime.now()),
+            #         "week": week,
+            #         "season": SEASON,
+            #         "raw_json": record,
+            #     }
+            #     for record in raw
+            # ]
 
-            print(f"Loading {len(rows)} record(s) to BigQuery...")
-            load_to_bronze(rows, TABLE_NAME)
-            print(f"Week {week} loaded successfully!")
+            # print(f"Loading {len(rows)} record(s) to BigQuery...")
+            # load_to_bronze(rows, TABLE_NAME)
+            # print(f"Week {week} loaded successfully!")
 
         except Exception as e:
             print(f"Error in Week {week}: {e}")

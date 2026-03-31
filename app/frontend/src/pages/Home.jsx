@@ -31,6 +31,7 @@ const Home = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+
         const filteredSettingsKeys = Object.keys(data.settings).filter(
           (key) => key !== "season"
         );
