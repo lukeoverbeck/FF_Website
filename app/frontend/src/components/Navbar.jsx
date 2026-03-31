@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users } from "lucide-react";
+import { Home, Users, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -9,9 +9,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  // Eventually pull these from BigQuery
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   const userName = "Luke O.";
   const userRole = "Commissioner";
   const leagueName = "Game of Inches";
@@ -21,7 +28,6 @@ const Navbar = () => {
       <nav className="border-b bg-background sticky top-0 z-50">
         <div className="container mx-auto h-16 flex items-center justify-between px-6 py-3">
           {/* Navigation */}
-
           <div className="flex items-center gap-1 rounded-full bg-muted/40 p-1 border">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -37,6 +43,7 @@ const Navbar = () => {
                 <p>Home</p>
               </TooltipContent>
             </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -52,20 +59,19 @@ const Navbar = () => {
               </TooltipContent>
             </Tooltip>
           </div>
+
           {/* Title */}
           <Link
             to="/"
             className="flex items-center gap-2 rounded-full p-2 hover:bg-muted/50 hover:border transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-xl tracking-tight">
-                {leagueName}
-              </span>
-            </div>
+            <span className="font-bold text-xl tracking-tight">
+              {leagueName}
+            </span>
           </Link>
+
           {/* User Actions and Profile */}
           <div className="flex items-center gap-4">
-            {/* Separator and Profile Info */}
             <div className="flex items-center gap-3 pl-4 border-l">
               <div className="hidden md:flex flex-col items-end">
                 <span className="text-sm font-semibold leading-none">
@@ -75,10 +81,27 @@ const Navbar = () => {
                   {userRole}
                 </span>
               </div>
+
               <Avatar className="h-9 w-9 border-2">
                 <AvatarImage src="" alt="User Profile" />
                 <AvatarFallback>LO</AvatarFallback>
               </Avatar>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleSignOut}
+                    className="h-9 w-9 rounded-full text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Sign Out</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>

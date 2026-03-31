@@ -1,11 +1,17 @@
 from google.cloud import bigquery
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Header
 from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
+from jose import jwt, JWTError
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 app = FastAPI()
 client = bigquery.Client()
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Add CORS middleware
 app.add_middleware(
@@ -16,13 +22,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
+def require_auth(authorization: str = Header(...)):
+    try:
+        token = authorization.split(" ")[1]  # "Bearer <token>"
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload
+    except:
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
 @app.get("/api/rich_roster/{season}", response_model=list[RichRoster])
-async def get_rich_roster(season: int):
+async def get_rich_roster(season: int, user=Depends(require_auth)):
     # SQL query with placeholder for season (@)
     query = "SELECT * FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = @season_val"
 
@@ -43,7 +52,7 @@ async def get_rich_roster(season: int):
 
 # Home dashboard endpoint - combines league settings and league winners for a given season
 @app.get("/api/home_dashboard/{season}", response_model=HomeDashboard)
-async def get_home_dashboard(season: int):
+async def get_home_dashboard(season: int, user=Depends(require_auth)):
 
     # Configure the query job with the parameter
     job_config = bigquery.QueryJobConfig(
@@ -75,12 +84,8 @@ async def get_home_dashboard(season: int):
         "league_winners": league_winners
     }
 
-# Need to do:
-# reformat queries to match models
-# reformat models to account for combining matchup dropdown with matchup bar
-# write logic to combine dropdown with bar
 @app.get("/api/user_dashboard/{season}/{roster_id}", response_model=UserDashboard)
-async def get_user_dashboard(season: int, roster_id: int):
+async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_auth)):
 
     # Configure the query job with the parameter
     job_config = bigquery.QueryJobConfig(
@@ -191,5 +196,11 @@ def login(body: LoginRequest):
 
     if not bcrypt.checkpw(password_bytes, hash_from_db):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    token = jwt.encode(
+        {"sub": body.username, "exp": datetime.now() + timedelta(hours=8)},
+        SECRET_KEY,
+        algorithm="HS256"
+    )
 
-    return { "success": True }
+    return { "token": token }
