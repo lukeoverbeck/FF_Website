@@ -3,6 +3,7 @@ import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
 import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
+import Navbar from "../components/Navbar";
 
 const SkeletonCard = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
@@ -84,53 +85,56 @@ const User = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <div className="container mx-auto p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          {isLoading ? (
-            <>
-              <SkeletonCard className="" />
-              <SkeletonCard className="" />
-            </>
-          ) : (
-            <>
-              {/* One Fragment to rule them both! */}
-              {userInfo && (
-                <UserInfo
-                  teamName={userInfo.teamName}
-                  displayName={userInfo.displayName}
-                  playerNicknames={userInfo.playerNicknames}
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-slate-100">
+        <div className="container mx-auto p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+            {isLoading ? (
+              <>
+                <SkeletonCard className="" />
+                <SkeletonCard className="" />
+              </>
+            ) : (
+              <>
+                {/* One Fragment to rule them both! */}
+                {userInfo && (
+                  <UserInfo
+                    teamName={userInfo.teamName}
+                    displayName={userInfo.displayName}
+                    playerNicknames={userInfo.playerNicknames}
+                  />
+                )}
+
+                <UserStats
+                  year={userStats.year}
+                  totalRecord={userStats.totalRecord}
+                  headToHeadRecord={userStats.headToHeadRecord}
+                  leagueMedianRecord={userStats.leagueMedianRecord}
+                  regularSeasonRank={userStats.regularSeasonRank}
+                  pointsFor={userStats.pointsFor}
+                  pointsAgainst={userStats.pointsAgainst}
                 />
-              )}
+              </>
+            )}
+          </div>
 
-              <UserStats
-                year={userStats.year}
-                totalRecord={userStats.totalRecord}
-                headToHeadRecord={userStats.headToHeadRecord}
-                leagueMedianRecord={userStats.leagueMedianRecord}
-                regularSeasonRank={userStats.regularSeasonRank}
-                pointsFor={userStats.pointsFor}
-                pointsAgainst={userStats.pointsAgainst}
-              />
-            </>
-          )}
+          <div>
+            <h1 className="text-center text-3xl font-bold">
+              <span className="border-b">Matchups</span>
+            </h1>
+          </div>
+
+          {/* 2. Map through the matchups array */}
+          {matchupsData.map((matchup) => (
+            <MatchupBar
+              key={matchup.id} // Always use a unique key for list items
+              {...matchup} // Spread the matchup properties as props to MatchupBar
+            />
+          ))}
         </div>
-
-        <div>
-          <h1 className="text-center text-3xl font-bold">
-            <span className="border-b">Matchups</span>
-          </h1>
-        </div>
-
-        {/* 2. Map through the matchups array */}
-        {matchupsData.map((matchup) => (
-          <MatchupBar
-            key={matchup.id} // Always use a unique key for list items
-            {...matchup} // Spread the matchup properties as props to MatchupBar
-          />
-        ))}
-      </div>
-    </main>
+      </main>
+    </>
   );
 };
 
