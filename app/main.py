@@ -1,17 +1,19 @@
 from google.cloud import bigquery
 from fastapi import FastAPI, HTTPException, Depends, Header
-from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
 from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 app = FastAPI()
 client = bigquery.Client()
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
+security = HTTPBearer()
 
 # Add CORS middleware
 app.add_middleware(
@@ -22,9 +24,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def require_auth(authorization: str = Header(...)):
+def require_auth(auth: HTTPAuthorizationCredentials = Depends(security)):
     try:
-        token = authorization.split(" ")[1]  # "Bearer <token>"
+        token = auth.credentials
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return payload
     except:
@@ -76,12 +78,17 @@ async def get_home_dashboard(season: int, user=Depends(require_auth)):
         SELECT * FROM `fantasy-league-data-engine.gold_layer.league_winners`
         ORDER BY season DESC
     """
-    league_winners_res = client.query(league_winners_query, job_config=job_config).result()
+    league_winners_res = client.query(league_winners_query).result()
     league_winners = [row for row in league_winners_res]
+
+    # Query 3: Manager Highlight (Single Object)
+    highlight_query = "SELECT * FROM `fantasy-league-data-engine.gold_layer.current_highlight`"
+    highlight_res = client.query(highlight_query).result()
 
     return {
         "settings": league_settings,
-        "league_winners": league_winners
+        "league_winners": league_winners,
+        "manager_highlight": list(highlight_res)[0]
     }
 
 @app.get("/api/user_dashboard/{season}/{roster_id}", response_model=UserDashboard)
@@ -197,10 +204,57 @@ def login(body: LoginRequest):
     if not bcrypt.checkpw(password_bytes, hash_from_db):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
+    now_utc = datetime.now(timezone.utc)
+    
     token = jwt.encode(
-        {"sub": body.username, "exp": datetime.now() + timedelta(hours=8)},
+        {"sub": body.username, "iat": now_utc, "exp": now_utc + timedelta(hours=8)},
         SECRET_KEY,
         algorithm="HS256"
     )
 
     return { "token": token }
+
+# Grab all the managers from 2025
+@app.get("/api/managers/2025", response_model=list[Managers])
+async def get_managers(user=Depends(require_auth)):
+# async def get_managers():
+    # SQL query with placeholder for season (@)
+    query = "SELECT display_name, team_name, total_wins, total_losses FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = 2025"
+
+    # Execute the query
+    query_job = client.query(query)
+
+    # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
+    results = query_job.result()
+
+    return [row for row in results]
+
+# Update the manager highlight data
+@app.post("/api/manager_highlight")
+async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_auth)):
+    # SQL query with placeholder for season (@)
+    query = """
+        TRUNCATE TABLE `fantasy-league-data-engine.gold_layer.current_highlight`;
+
+        INSERT INTO `fantasy-league-data-engine.gold_layer.current_highlight` 
+        (display_name, team_name, wins, losses, message) 
+        VALUES (@display_name_val, @team_name_val, @wins_val, @losses_val, @message_val);
+    """
+
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("display_name_val", "STRING", body.display_name),
+            bigquery.ScalarQueryParameter("team_name_val", "STRING", body.team_name),
+            bigquery.ScalarQueryParameter("wins_val", "INT64", body.wins),
+            bigquery.ScalarQueryParameter("losses_val", "INT64", body.losses),
+            bigquery.ScalarQueryParameter("message_val", "STRING", body.message)
+        ]
+    )
+
+    # Execute the query
+    query_job = client.query(query, job_config=job_config)
+
+    # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
+    results = query_job.result()
+
+    return {"status": "success"}

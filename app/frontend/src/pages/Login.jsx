@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authFetch } from "../lib/utils";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -8,16 +9,13 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-    const res = await fetch("/api/login", {
+    const res = await authFetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
 
     const data = await res.json();
-    // const text = await res.text();
-    // console.log("status:", res.status);
-    // console.log("raw response:", text);
 
     if (res.ok) {
       localStorage.setItem("token", data.token);

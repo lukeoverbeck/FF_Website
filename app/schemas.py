@@ -63,12 +63,20 @@ class RichRoster(BigQueryModel):
     # If the column is empty in BigQuery, the API returns [] instead of null
     player_details: list[RichRosterRecord] = Field(default_factory=list)
 
+class ManagerHighlight(BigQueryModel):
+    display_name: str
+    team_name: str
+    wins: int
+    losses: int
+    message: str
+
 # Home dashboard model
 class HomeDashboard(BigQueryModel):
     # Not a list because it is for a singular year
     settings: LeagueSettings
     # List because home page always shows all winners
     league_winners: List[LeagueWinners]
+    manager_highlight: ManagerHighlight
 
 # Helper for MatchupEntry to put matchup dropdowns for both teams together
 class MatchupComparison(BigQueryModel):
@@ -88,3 +96,9 @@ class UserDashboard(BigQueryModel):
 class LoginRequest(BigQueryModel):
     username: str
     password: str
+
+class Managers(BigQueryModel):
+    display_name: str
+    team_name: str
+    total_wins: int
+    total_losses: int
