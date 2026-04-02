@@ -2,8 +2,9 @@ import SettingsCard from "../components/SettingsCard";
 import WinnerCard from "../components/WinnerCard";
 import footballImage from "../assets/football.jpg";
 import { useState, useEffect } from "react";
-import { cn } from "../lib/utils";
+import { cn, authFetch } from "../lib/utils";
 import Navbar from "../components/Navbar";
+import ManagerHighlight from "../components/ManagerHighlight";
 
 const settingsConfig = {
   num_teams: { label: "Number of Teams", formatter: (val) => val },
@@ -22,13 +23,23 @@ const SkeletonCard = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
 );
 
+const fakeHighlight = {
+  display_name: "Mike Johnson",
+  team_name: "Touchdown Kings",
+  wins: 5,
+  losses: 0,
+  message:
+    "Mike has been absolutely dominant this season, sitting at a perfect 5-0 record. His squad has been firing on all cylinders — leading the league in points scored three out of the last four weeks. Keep an eye on this team as we head into the back half of the season.",
+};
+
 const Home = () => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
+  const [highlight, setHighlight] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/home_dashboard/2025", {
+    authFetch("/api/home_dashboard/2025", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -36,13 +47,10 @@ const Home = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         const filteredSettingsKeys = Object.keys(data.settings).filter(
           (key) => key !== "season"
         );
 
-        // data.settings is your original object
         const formattedSettingsArray = filteredSettingsKeys.map((key) => {
           const config = settingsConfig[key];
           return {
@@ -66,6 +74,7 @@ const Home = () => {
 
         setSettingsCards(formattedSettingsArray);
         setWinnersCards(formattedWinnersArray);
+        setHighlight(data.manager_highlight);
         setIsLoading(false);
       });
   }, []);
@@ -118,23 +127,26 @@ const Home = () => {
               ))
             )}
           </div>
-          <div className="flex flex-col gap-5 max-w-md mx-auto">
-            {isLoading ? (
-              <>
-                <SkeletonCard className="" />
-                <SkeletonCard className="" />
-                <SkeletonCard className="" />
-                <SkeletonCard className="" />
-              </>
-            ) : (
-              winnersCards.map((card) => (
-                <WinnerCard
-                  key={card.id} // Use the season/year as the unique key
-                  className=""
-                  {...card}
-                />
-              ))
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch bg-white p-6 rounded-xl shadow">
+            <div className="flex flex-col gap-5 max-w-md mx-auto">
+              {isLoading ? (
+                <>
+                  <SkeletonCard className="" />
+                  <SkeletonCard className="" />
+                  <SkeletonCard className="" />
+                  <SkeletonCard className="" />
+                </>
+              ) : (
+                winnersCards.map((card) => (
+                  <WinnerCard
+                    key={card.id} // Use the season/year as the unique key
+                    className=""
+                    {...card}
+                  />
+                ))
+              )}
+            </div>
+            <ManagerHighlight highlight={highlight} />
           </div>
         </div>
       </main>

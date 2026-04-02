@@ -2,7 +2,7 @@ import MatchupBar from "../components/MatchupBar";
 import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
 import { useState, useEffect } from "react";
-import { cn } from "../lib/utils";
+import { cn, authFetch } from "../lib/utils";
 import Navbar from "../components/Navbar";
 
 const SkeletonCard = ({ className }) => (
@@ -13,43 +13,51 @@ const User = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
-  const [userPlayerData, setUserPlayerData] = useState([]);
-  const [opponentPlayerData, setOpponentPlayerData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/user_dashboard/2025/1"),
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          const user = data.roster_info;
-          setUserInfo({
-            id: user.display_name, // Not really necessary here
-            teamName: user.team_name,
-            displayName: user.display_name,
-            playerNicknames: user.player_details || [],
-          });
-          setUserStats({
-            id: user.display_name, // Not really necessary here
-            year: user.season,
-            totalRecord: `${user.total_wins}-${user.total_losses}`,
-            headToHeadRecord: `${user.head_to_head_wins}-${user.head_to_head_losses}`,
-            leagueMedianRecord: `${user.median_wins}-${user.median_losses}`,
-            regularSeasonRank: user.regular_season_rank,
-            pointsFor: user.points_for,
-            pointsAgainst: user.points_against,
+    authFetch("/api/user_dashboard/2025/1", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        const user = data.roster_info;
+        setUserInfo({
+          id: user.display_name, // Not really necessary here
+          teamName: user.team_name,
+          displayName: user.display_name,
+          playerNicknames: user.player_details || [],
+        });
+        setUserStats({
+          id: user.display_name, // Not really necessary here
+          year: user.season,
+          totalRecord: `${user.total_wins}-${user.total_losses}`,
+          headToHeadRecord: `${user.head_to_head_wins}-${user.head_to_head_losses}`,
+          leagueMedianRecord: `${user.median_wins}-${user.median_losses}`,
+          regularSeasonRank: user.regular_season_rank,
+          pointsFor: user.points_for,
+          pointsAgainst: user.points_against,
+        });
+
+        console.log("Raw Matchups:", data.matchups);
+
+        const formattedMatchupsArray = data.matchups.map((matchup) => {
+          const innerUserMatchup = matchup.details.user_team.map((player) => {
+            return {
+              pos: player.position,
+              name: player.full_name,
+              points: player.points,
+              team: player.team,
+              fantasy_pos: player.fantasy_position,
+            };
           });
 
-          console.log("Raw Matchups:", data.matchups);
-
-          const formattedMatchupsArray = data.matchups.map((matchup) => {
-            const innerUserMatchup = matchup.details.user_team.map((player) => {
+          const innerOpponentMatchup = matchup.details.opponent_team.map(
+            (player) => {
               return {
                 pos: player.position,
                 name: player.full_name,
@@ -57,37 +65,26 @@ const User = () => {
                 team: player.team,
                 fantasy_pos: player.fantasy_position,
               };
-            });
+            }
+          );
 
-            const innerOpponentMatchup = matchup.details.opponent_team.map(
-              (player) => {
-                return {
-                  pos: player.position,
-                  name: player.full_name,
-                  points: player.points,
-                  team: player.team,
-                  fantasy_pos: player.fantasy_position,
-                };
-              }
-            );
-
-            matchup = matchup.summary;
-            return {
-              id: matchup.week,
-              week: matchup.week,
-              userScore: matchup.user_score,
-              opponentScore: matchup.opponent_score,
-              opponentName: matchup.opponent_team_name,
-              userPlayers: innerUserMatchup,
-              opponentPlayers: innerOpponentMatchup,
-            };
-          });
-
-          console.log("Formatted matchups:", formattedMatchupsArray);
-
-          setMatchupsData(formattedMatchupsArray);
-          setIsLoading(false);
+          matchup = matchup.summary;
+          return {
+            id: matchup.week,
+            week: matchup.week,
+            userScore: matchup.user_score,
+            opponentScore: matchup.opponent_score,
+            opponentName: matchup.opponent_team_name,
+            userPlayers: innerUserMatchup,
+            opponentPlayers: innerOpponentMatchup,
+          };
         });
+
+        console.log("Formatted matchups:", formattedMatchupsArray);
+
+        setMatchupsData(formattedMatchupsArray);
+        setIsLoading(false);
+      });
   }, []);
 
   return (
