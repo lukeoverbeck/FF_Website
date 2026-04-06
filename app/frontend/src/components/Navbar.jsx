@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { authFetch } from "../lib/utils";
 
-const Navbar = () => {
+const Navbar = ({ currentYear, onYearChange }) => {
   const navigate = useNavigate();
   const [userCard, setUserCard] = useState({
     display_name: "",
@@ -22,7 +22,7 @@ const Navbar = () => {
   });
 
   useEffect(() => {
-    authFetch("/api/navbar/1/2025", {
+    authFetch(`/api/navbar/1/${currentYear}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -30,7 +30,7 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => setUserCard(data));
-  }, []);
+  }, [currentYear]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -104,7 +104,7 @@ const Navbar = () => {
                   alt="User Profile"
                 />
                 <AvatarFallback>
-                  {userCard.display_name.slice(0, 2).toUpperCase()}
+                  {userCard?.display_name?.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
@@ -123,6 +123,16 @@ const Navbar = () => {
                   <p>Sign Out</p>
                 </TooltipContent>
               </Tooltip>
+              <nav>
+                {/* 3. Use the setter in your dropdown or buttons */}
+                <select
+                  value={currentYear}
+                  onChange={(e) => onYearChange(e.target.value)}
+                >
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                </select>
+              </nav>
             </div>
           </div>
         </div>

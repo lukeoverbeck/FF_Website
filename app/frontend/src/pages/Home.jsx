@@ -3,7 +3,6 @@ import WinnerCard from "../components/WinnerCard";
 import footballImage from "../assets/football.jpg";
 import { useState, useEffect } from "react";
 import { cn, authFetch } from "../lib/utils";
-import Navbar from "../components/Navbar";
 import ManagerHighlight from "../components/ManagerHighlight";
 
 const settingsConfig = {
@@ -74,7 +73,6 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-100">
         {/* This div keeps everything centered and bounded */}
         <div className="container mx-auto p-6 space-y-8">

@@ -2,9 +2,11 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import User from "./pages/User";
 import Login from "./pages/Login";
+import Navbar from "./components/Navbar";
 import Commissioner from "./pages/Commissioner";
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useState } from "react";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -36,9 +38,13 @@ const CatchAll = () => {
 };
 
 function App() {
+  const [year, setYear] = useState("2025");
+  const token = localStorage.getItem("token");
+
   return (
     <div className="min-h-screen bg-background">
       <main>
+        {token && <Navbar currentYear={year} onYearChange={setYear} />}
         <Routes>
           <Route
             path="/"
@@ -60,7 +66,7 @@ function App() {
             path="/user"
             element={
               <ProtectedRoute>
-                <User />
+                <User year={year} />
               </ProtectedRoute>
             }
           />
