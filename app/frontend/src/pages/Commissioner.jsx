@@ -86,7 +86,6 @@ const Commissioner = () => {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-6">
         <div className="bg-white rounded-xl shadow p-10 flex flex-col gap-6 w-full max-w-lg">
           {/* Header */}

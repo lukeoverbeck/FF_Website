@@ -3,20 +3,19 @@ import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
 import { useState, useEffect } from "react";
 import { cn, authFetch } from "../lib/utils";
-import Navbar from "../components/Navbar";
 
 const SkeletonCard = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
 );
 
-const User = () => {
+const User = ({ year }) => {
   const [userInfo, setUserInfo] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    authFetch("/api/user_dashboard/2025/1", {
+    authFetch(`/api/user_dashboard/${year}/1`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -36,7 +35,7 @@ const User = () => {
           id: user.display_name, // Not really necessary here
           year: user.season,
           totalRecord: `${user.total_wins}-${user.total_losses}`,
-          headToHeadRecord: `${user.head_to_head_wins}-${user.head_to_head_losses}`,
+          headToHeadRecord: `${user.h2h_wins}-${user.h2h_losses}`,
           leagueMedianRecord: `${user.median_wins}-${user.median_losses}`,
           regularSeasonRank: user.regular_season_rank,
           pointsFor: user.points_for,
@@ -85,11 +84,10 @@ const User = () => {
         setMatchupsData(formattedMatchupsArray);
         setIsLoading(false);
       });
-  }, []);
+  }, [year]);
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-100">
         <div className="container mx-auto p-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
