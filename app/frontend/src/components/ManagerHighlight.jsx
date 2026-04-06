@@ -1,4 +1,7 @@
 const ManagerHighlight = ({ highlight }) => {
+  if (!highlight)
+    return <div className="animate-pulse bg-gray-200 h-40 rounded-lg"></div>;
+
   const { display_name, team_name, wins, losses, message } = highlight;
 
   return (

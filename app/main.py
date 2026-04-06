@@ -1,7 +1,7 @@
 from google.cloud import bigquery
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight
+from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight, Navbar
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
 from jose import jwt, JWTError
@@ -32,14 +32,15 @@ def require_auth(auth: HTTPAuthorizationCredentials = Depends(security)):
     except:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-@app.get("/api/rich_roster/{season}", response_model=list[RichRoster])
-async def get_rich_roster(season: int, user=Depends(require_auth)):
-    # SQL query with placeholder for season (@)
-    query = "SELECT * FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = @season_val"
+@app.get("/api/navbar/{roster_id}/{season}", response_model=Navbar)
+async def get_navbar(roster_id: int, season: int,  user=Depends(require_auth)):
+    
+    query = "SELECT display_name, team_name, profile_picture FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE roster_id = @roster_id_val AND season = @season_val"
 
     # Configure the query job with the parameter
     job_config = bigquery.QueryJobConfig(
         query_parameters=[
+            bigquery.ScalarQueryParameter("roster_id_val", "INT64", roster_id),
             bigquery.ScalarQueryParameter("season_val", "INT64", season)
         ]
     )
@@ -48,9 +49,9 @@ async def get_rich_roster(season: int, user=Depends(require_auth)):
     query_job = client.query(query, job_config=job_config)
 
     # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
-    results = query_job.result()
+    results = list(query_job.result())
 
-    return [row for row in results]
+    return results[0]
 
 # Home dashboard endpoint - combines league settings and league winners for a given season
 @app.get("/api/home_dashboard/{season}", response_model=HomeDashboard)

@@ -102,3 +102,8 @@ class Managers(BigQueryModel):
     team_name: str
     total_wins: int
     total_losses: int
+
+class Navbar(BigQueryModel):
+    display_name: str
+    team_name: str
+    profile_picture: str

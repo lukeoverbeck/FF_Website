@@ -23,15 +23,6 @@ const SkeletonCard = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
 );
 
-const fakeHighlight = {
-  display_name: "Mike Johnson",
-  team_name: "Touchdown Kings",
-  wins: 5,
-  losses: 0,
-  message:
-    "Mike has been absolutely dominant this season, sitting at a perfect 5-0 record. His squad has been firing on all cylinders — leading the league in points scored three out of the last four weeks. Keep an eye on this team as we head into the back half of the season.",
-};
-
 const Home = () => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
@@ -71,6 +62,8 @@ const Home = () => {
             losses: winner.losses,
           };
         });
+
+        console.log(data.manager_highlight);
 
         setSettingsCards(formattedSettingsArray);
         setWinnersCards(formattedWinnersArray);
@@ -128,7 +121,7 @@ const Home = () => {
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch bg-white p-6 rounded-xl shadow">
-            <div className="flex flex-col gap-5 max-w-md mx-auto">
+            <div className="flex flex-col gap-5 max-w-lg mx-auto w-full">
               {isLoading ? (
                 <>
                   <SkeletonCard className="" />
