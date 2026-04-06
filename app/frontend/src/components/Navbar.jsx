@@ -10,18 +10,32 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { authFetch } from "../lib/utils";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [userCard, setUserCard] = useState({
+    display_name: "",
+    team_name: "",
+    profile_picture: "",
+  });
+
+  useEffect(() => {
+    authFetch("/api/navbar/1/2025", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setUserCard(data));
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
-
-  const userName = "Luke O.";
-  const userRole = "Commissioner";
-  const leagueName = "Game of Inches";
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -35,6 +49,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   className="h-9 w-9 rounded-full"
+                  onClick={() => navigate("/home")}
                 >
                   <Home className="h-5 w-5" />
                 </Button>
@@ -50,6 +65,7 @@ const Navbar = () => {
                   variant="ghost"
                   size="icon"
                   className="h-9 w-9 rounded-full"
+                  onClick={() => navigate("/user")}
                 >
                   <Users className="h-5 w-5" />
                 </Button>
@@ -66,7 +82,7 @@ const Navbar = () => {
             className="flex items-center gap-2 rounded-full p-2 hover:bg-muted/50 hover:border transition-colors"
           >
             <span className="font-bold text-xl tracking-tight">
-              {leagueName}
+              Game of Inches
             </span>
           </Link>
 
@@ -75,16 +91,21 @@ const Navbar = () => {
             <div className="flex items-center gap-3 pl-4 border-l">
               <div className="hidden md:flex flex-col items-end">
                 <span className="text-sm font-semibold leading-none">
-                  {userName}
+                  {userCard.team_name}
                 </span>
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1">
-                  {userRole}
+                <span className="text-[10px] font-bold text-muted-foreground tracking-wider mt-1">
+                  {userCard.display_name}
                 </span>
               </div>
 
               <Avatar className="h-9 w-9 border-2">
-                <AvatarImage src="" alt="User Profile" />
-                <AvatarFallback>LO</AvatarFallback>
+                <AvatarImage
+                  src={userCard.profile_picture}
+                  alt="User Profile"
+                />
+                <AvatarFallback>
+                  {userCard.display_name.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
 
               <Tooltip>
