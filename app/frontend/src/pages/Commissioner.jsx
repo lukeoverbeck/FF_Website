@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
 import { authFetch } from "../lib/utils";
 
 const Commissioner = () => {
@@ -8,11 +7,11 @@ const Commissioner = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(null); // "success" | "error" | null
+  const [saveStatus, setSaveStatus] = useState(null);
 
   // Fetch all managers
   useEffect(() => {
-    setIsLoading(true); // Ensure it's true when starting
+    setIsLoading(true);
 
     authFetch("/api/managers/2025", {
       method: "GET",

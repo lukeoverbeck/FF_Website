@@ -2,20 +2,19 @@ import MatchupBar from "../components/MatchupBar";
 import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
 import { useState, useEffect } from "react";
-import { cn, authFetch } from "../lib/utils";
+import { authFetch } from "../lib/utils";
+import SkeletonCard from "../components/SkeletonCard";
 
-const SkeletonCard = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
-);
-
-const User = ({ year }) => {
+const User = ({ year, currentRosterId }) => {
   const [userInfo, setUserInfo] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    authFetch(`/api/user_dashboard/${year}/1`, {
+    if (!currentRosterId) return; // Don't fetch until we have the roster ID
+    setIsLoading(true);
+    authFetch(`/api/user_dashboard/${year}/${currentRosterId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -29,6 +28,7 @@ const User = ({ year }) => {
           id: user.display_name, // Not really necessary here
           teamName: user.team_name,
           displayName: user.display_name,
+          profilePicture: user.profile_picture,
           playerNicknames: user.player_details || [],
         });
         setUserStats({
@@ -84,7 +84,7 @@ const User = ({ year }) => {
         setMatchupsData(formattedMatchupsArray);
         setIsLoading(false);
       });
-  }, [year]);
+  }, [year, currentRosterId]); // Runs every time the year OR user changes
 
   return (
     <>
@@ -93,17 +93,17 @@ const User = ({ year }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {isLoading ? (
               <>
-                <SkeletonCard className="" />
-                <SkeletonCard className="" />
+                <SkeletonCard className="h-40" />
+                <SkeletonCard className="h-40" />
               </>
             ) : (
               <>
-                {/* One Fragment to rule them both! */}
                 {userInfo && (
                   <UserInfo
                     teamName={userInfo.teamName}
                     displayName={userInfo.displayName}
                     playerNicknames={userInfo.playerNicknames}
+                    profilePicture={userInfo.profilePicture}
                   />
                 )}
 
@@ -127,12 +127,31 @@ const User = ({ year }) => {
           </div>
 
           {/* 2. Map through the matchups array */}
-          {matchupsData.map((matchup) => (
-            <MatchupBar
-              key={matchup.id} // Always use a unique key for list items
-              {...matchup} // Spread the matchup properties as props to MatchupBar
-            />
-          ))}
+          {isLoading ? (
+            <>
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+              <SkeletonCard className="" />
+            </>
+          ) : (
+            matchupsData.map((matchup) => (
+              <MatchupBar
+                key={matchup.id} // Always use a unique key for list items
+                {...matchup} // Spread the matchup properties as props to MatchupBar
+              />
+            ))
+          )}
         </div>
       </main>
     </>

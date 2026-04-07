@@ -2,8 +2,9 @@ import SettingsCard from "../components/SettingsCard";
 import WinnerCard from "../components/WinnerCard";
 import footballImage from "../assets/football.jpg";
 import { useState, useEffect } from "react";
-import { cn, authFetch } from "../lib/utils";
+import { authFetch } from "../lib/utils";
 import ManagerHighlight from "../components/ManagerHighlight";
+import SkeletonCard from "../components/SkeletonCard";
 
 const settingsConfig = {
   num_teams: { label: "Number of Teams", formatter: (val) => val },
@@ -18,10 +19,6 @@ const settingsConfig = {
   scoring_type: { label: "Scoring System", formatter: (val) => val },
 };
 
-const SkeletonCard = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-300 gap-3 h-24", className)}></div>
-);
-
 const Home = () => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
@@ -29,6 +26,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
     authFetch("/api/home_dashboard/2025", {
       method: "GET",
       headers: {
@@ -99,7 +97,6 @@ const Home = () => {
             </figure>
           </div>
 
-          {/* Eventually pull from BigQuery */}
           <div className="grid grid-cols-12 gap-6">
             {isLoading ? (
               <>
@@ -122,10 +119,10 @@ const Home = () => {
             <div className="flex flex-col gap-5 max-w-lg mx-auto w-full">
               {isLoading ? (
                 <>
-                  <SkeletonCard className="" />
-                  <SkeletonCard className="" />
-                  <SkeletonCard className="" />
-                  <SkeletonCard className="" />
+                  <SkeletonCard className="h-24" />
+                  <SkeletonCard className="h-24" />
+                  <SkeletonCard className="h-24" />
+                  <SkeletonCard className="h-24" />
                 </>
               ) : (
                 winnersCards.map((card) => (

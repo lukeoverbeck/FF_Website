@@ -12,28 +12,36 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { authFetch } from "../lib/utils";
+import SkeletonCard from "./SkeletonCard";
 
-const Navbar = ({ currentYear, onYearChange }) => {
+const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   const navigate = useNavigate();
   const [userCard, setUserCard] = useState({
     display_name: "",
     team_name: "",
     profile_picture: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    authFetch(`/api/navbar/1/${currentYear}`, {
+    if (!currentRosterId) return; // Don't fetch until we have the roster ID
+    setIsLoading(true);
+    authFetch(`/api/navbar/${currentRosterId}/${currentYear}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
       .then((res) => res.json())
-      .then((data) => setUserCard(data));
-  }, [currentYear]);
+      .then((data) => {
+        setUserCard(data);
+        setIsLoading(false);
+      });
+  }, [currentYear, currentRosterId]);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
+    setToken(null);
     navigate("/login");
   };
 
@@ -90,23 +98,38 @@ const Navbar = ({ currentYear, onYearChange }) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 pl-4 border-l">
               <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-semibold leading-none">
-                  {userCard.team_name}
-                </span>
-                <span className="text-[10px] font-bold text-muted-foreground tracking-wider mt-1">
-                  {userCard.display_name}
-                </span>
+                {isLoading ? (
+                  <div className="flex flex-col gap-1">
+                    <SkeletonCard className="h-3 w-8" />
+                    <SkeletonCard className="h-3 w-8" />
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-sm font-semibold leading-none">
+                      {userCard.team_name}
+                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground tracking-wider mt-1">
+                      {userCard.display_name}
+                    </span>
+                  </>
+                )}
               </div>
 
-              <Avatar className="h-9 w-9 border-2">
-                <AvatarImage
-                  src={userCard.profile_picture}
-                  alt="User Profile"
-                />
-                <AvatarFallback>
-                  {userCard?.display_name?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              {isLoading ? (
+                <SkeletonCard className="h-8 w-8 rounded-full" />
+              ) : (
+                <>
+                  <Avatar className="h-9 w-9 border-2">
+                    <AvatarImage
+                      src={userCard.profile_picture}
+                      alt="User Profile"
+                    />
+                    <AvatarFallback>
+                      {userCard?.display_name?.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </>
+              )}
 
               <Tooltip>
                 <TooltipTrigger asChild>
