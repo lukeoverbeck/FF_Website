@@ -7,11 +7,11 @@ import {
   CardContent,
 } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { cn } from "../lib/utils";
 
 const UserInfo = ({
   teamName,
   displayName,
+  profilePicture,
   playerNicknames = [],
   awardsWon = [],
   ...props
@@ -31,12 +31,15 @@ const UserInfo = ({
       <CardContent className="flex flex-col h-full justify-center gap-6 p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-20 w-20 border-2">
-            <AvatarImage src="" alt="User Profile" />
-            <AvatarFallback>LO</AvatarFallback>
+            <AvatarImage src={profilePicture} alt="User Profile" />
+            <AvatarFallback>
+              {displayName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
+
           <div className="flex flex-col">
             <span className="text-sm font-semibold">{teamName}</span>
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mt-1">
+            <span className="text-[10px] font-bold text-muted-foreground tracking-wider mt-1">
               {displayName}
             </span>
           </div>

@@ -62,6 +62,7 @@ class RichRoster(BigQueryModel):
     points_against: float
     # If the column is empty in BigQuery, the API returns [] instead of null
     player_details: list[RichRosterRecord] = Field(default_factory=list)
+    profile_picture: Optional[str]
 
 class ManagerHighlight(BigQueryModel):
     display_name: str
@@ -107,3 +108,6 @@ class Navbar(BigQueryModel):
     display_name: str
     team_name: str
     profile_picture: str
+
+class RosterMapping(BigQueryModel):
+    roster_id: int

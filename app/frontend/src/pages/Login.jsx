@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authFetch } from "../lib/utils";
 
-const LoginPage = () => {
+const LoginPage = ({ setToken }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,6 +19,7 @@ const LoginPage = () => {
 
     if (res.ok) {
       localStorage.setItem("token", data.token);
+      setToken(data.token);
       navigate("/home");
     } else {
       setError(data.detail);

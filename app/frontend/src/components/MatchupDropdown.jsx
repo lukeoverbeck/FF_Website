@@ -8,7 +8,17 @@ import {
 } from "./ui/table";
 
 // Define the lineup slots in the order they should be displayed
-const LINEUP_SLOTS = ["QB", "RB", "RB", "WR", "WR", "FLEX", "FLEX", "DST"];
+const LINEUP_SLOTS = [
+  "QB",
+  "RB",
+  "RB",
+  "WR",
+  "WR",
+  "TE",
+  "FLEX",
+  "FLEX",
+  "DST",
+];
 
 const MatchupDropdown = ({ userPlayers, opponentPlayers }) => {
   const splitIntoStartersAndBench = (players) => {

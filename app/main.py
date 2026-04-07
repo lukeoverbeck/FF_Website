@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 from fastapi import FastAPI, HTTPException, Depends, Header, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from schemas import RichRoster, HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight, Navbar
+from schemas import HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight, Navbar, RosterMapping
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
 from jose import jwt, JWTError
@@ -115,23 +115,21 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
     if rich_roster is None:
         raise ValueError(f"No roster found for season {season} and roster_id {roster_id}")
 
-    # Query 2: Matchup Bar (List of Objects)
+    # Query 2: Matchup Bar (List of Objects). Sometimes the user is team_a and sometimes team_b, so we use CASE statements to flip the teams/scores/winner logic based on whether team_a_id or team_b_id matches the roster_id parameter
     matchup_bar_query = """
         SELECT
             season,
             week,
-            team_a_id as user_id,
-            team_b_id as opponent_id,
-            team_a_name AS user_team_name,
-            team_b_name AS opponent_team_name,
-            score_a AS user_score,
-            score_b AS opponent_score,
-            CASE
-                WHEN winner_id = @roster_id_val THEN TRUE
-                ELSE FALSE
-            END AS user_won
+            CASE WHEN team_a_id = @roster_id_val THEN team_a_id ELSE team_b_id END AS user_id,
+            CASE WHEN team_a_id = @roster_id_val THEN team_b_id ELSE team_a_id END AS opponent_id,
+            CASE WHEN team_a_id = @roster_id_val THEN team_a_name ELSE team_b_name END AS user_team_name,
+            CASE WHEN team_a_id = @roster_id_val THEN team_b_name ELSE team_a_name END AS opponent_team_name,
+            CASE WHEN team_a_id = @roster_id_val THEN score_a ELSE score_b END AS user_score,
+            CASE WHEN team_a_id = @roster_id_val THEN score_b ELSE score_a END AS opponent_score,
+            CASE WHEN winner_id = @roster_id_val THEN TRUE ELSE FALSE END AS user_won
         FROM `fantasy-league-data-engine.gold_layer.matchup_bar`
-        WHERE season = @season_val AND team_a_id = @roster_id_val
+        WHERE season = @season_val 
+        AND (team_a_id = @roster_id_val OR team_b_id = @roster_id_val)
     """
     matchup_bar_res = client.query(matchup_bar_query, job_config=job_config).result()
     all_matchup_bars = [row for row in matchup_bar_res]
@@ -180,7 +178,7 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
 
 @app.post("/api/login")
 def login(body: LoginRequest):
-    query = """
+    password_query = """
         SELECT password_hash
         FROM `fantasy-league-data-engine.gold_layer.users`
         WHERE username = @username
@@ -193,7 +191,7 @@ def login(body: LoginRequest):
         ]
     )
 
-    results = client.query(query, job_config=job_config).result()
+    results = client.query(password_query, job_config=job_config).result()
     rows = list(results)
 
     if not rows:
@@ -206,9 +204,14 @@ def login(body: LoginRequest):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     now_utc = datetime.now(timezone.utc)
+    to_encode = {
+        "sub": body.username,
+        "iat": now_utc,
+        "exp": now_utc + timedelta(hours=8)
+    }
     
     token = jwt.encode(
-        {"sub": body.username, "iat": now_utc, "exp": now_utc + timedelta(hours=8)},
+        to_encode,
         SECRET_KEY,
         algorithm="HS256"
     )
@@ -259,3 +262,23 @@ async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_au
     results = query_job.result()
 
     return {"status": "success"}
+
+@app.get("/api/roster_mapping/{season}", response_model=RosterMapping)
+async def get_roster_id(season: int, user=Depends(require_auth)):
+    query = """
+        SELECT roster_id
+        FROM `fantasy-league-data-engine.gold_layer.rich_rosters`
+        WHERE season = @season_val
+        AND display_name = @display_name_val
+    """
+
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("season_val", "INT64", season),
+            bigquery.ScalarQueryParameter("display_name_val", "STRING", user["sub"])
+        ]
+    )
+
+    results = client.query(query, job_config=job_config).result()
+
+    return list(results)[0]
