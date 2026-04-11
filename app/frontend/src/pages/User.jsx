@@ -90,7 +90,7 @@ const User = ({ year, currentRosterId }) => {
     <>
       <main className="min-h-screen bg-slate-100">
         <div className="container mx-auto p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {isLoading ? (
               <>
                 <SkeletonCard className="h-40" />

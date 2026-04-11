@@ -51,8 +51,8 @@ class RichRoster(BigQueryModel):
     season: int
     display_name: str
     team_name: str
-    h2h_wins: int
-    h2h_losses: int
+    h2h_wins: Optional[int]
+    h2h_losses: Optional[int]
     median_wins: int
     median_losses: int
     total_wins: int
