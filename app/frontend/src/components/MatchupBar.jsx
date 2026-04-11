@@ -15,6 +15,7 @@ const MatchupBar = ({
   opponentPlayers,
 }) => {
   const isWin = userScore > opponentScore;
+  const isTie = userScore === opponentScore;
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -23,21 +24,25 @@ const MatchupBar = ({
         className="border rounded-xl bg-white shadow-sm overflow-hidden"
       >
         <AccordionTrigger className="hover:no-underline py-6 px-6">
-          <div className="flex items-center justify-between w-full pr-4">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full">
             {/* Week + W/L Section */}
-            <div className="flex items-center justify-center gap-10">
+            <div className="justify-self-start flex items-center justify-center gap-10">
               <span className="text-xl font-bold">Week {week}</span>
               <span
                 className={`text-xl font-bold uppercase px-2 py-0.5 ${
-                  isWin ? "text-green-700" : "text-red-700"
+                  isWin
+                    ? "text-green-700"
+                    : isTie
+                    ? "text-slate-700"
+                    : "text-red-700"
                 }`}
               >
-                {isWin ? "W" : "L"}
+                {isWin ? "W" : isTie ? "T" : "L"}
               </span>
             </div>
 
             {/* Opponent Section */}
-            <div className="flex items-center justify-center gap-1">
+            <div className="justify-self-center flex items-center justify-center gap-1">
               <span className="text-sm font-semibold lowercase tracking-wider text-muted-foreground">
                 vs.
               </span>
@@ -45,18 +50,32 @@ const MatchupBar = ({
             </div>
 
             {/* Score & Status Section */}
-            <div className="flex items-baseline gap-2">
-              <span
-                className={`text-3xl font-black ${
-                  isWin ? "text-blue-600" : "text-slate-900"
-                }`}
-              >
-                {userScore}
-              </span>
-              <span className="text-xl font-bold text-slate-400">-</span>
-              <span className="text-2xl font-bold text-slate-500">
-                {opponentScore}
-              </span>
+            <div className="justify-self-end">
+              <div className="flex items-baseline gap-2 pr-4">
+                <span
+                  className={`text-2xl font-black ${
+                    isWin
+                      ? "text-3xl text-green-700"
+                      : isTie
+                      ? "text-slate-900"
+                      : "text-slate-500"
+                  }`}
+                >
+                  {userScore.toFixed(2)}
+                </span>
+                <span className="text-xl font-bold text-slate-400">-</span>
+                <span
+                  className={`text-2xl font-black ${
+                    isWin
+                      ? "text-slate-500"
+                      : isTie
+                      ? "text-slate-900"
+                      : "text-3xl text-red-700"
+                  }`}
+                >
+                  {opponentScore.toFixed(2)}
+                </span>
+              </div>
             </div>
           </div>
         </AccordionTrigger>
@@ -67,6 +86,10 @@ const MatchupBar = ({
             <MatchupDropdown
               userPlayers={userPlayers}
               opponentPlayers={opponentPlayers}
+              userScore={userScore}
+              opponentScore={opponentScore}
+              isWin={isWin}
+              isTie={isTie}
             />
           </div>
         </AccordionContent>

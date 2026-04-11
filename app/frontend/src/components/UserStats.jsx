@@ -1,6 +1,8 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 
+const leagueMedianYears = ["2024", "2025"];
+
 const UserStats = ({
   totalRecord,
   headToHeadRecord,
@@ -8,6 +10,7 @@ const UserStats = ({
   regularSeasonRank,
   pointsFor,
   pointsAgainst,
+  year,
   ...props
 }) => {
   return (
@@ -23,11 +26,19 @@ const UserStats = ({
           </div>
           <div className="flex justify-between items-center text-sm">
             <span>H2H Record:</span>
-            <span className="font-semibold">{headToHeadRecord}</span>
+            <span className="font-semibold">
+              {leagueMedianYears.includes(String(year))
+                ? headToHeadRecord
+                : totalRecord}
+            </span>
           </div>
           <div className="flex justify-between items-center text-sm text-slate-500">
             <span>League Median:</span>
-            <span>{leagueMedianRecord}</span>
+            <span className="font-semibold">
+              {leagueMedianYears.includes(String(year))
+                ? leagueMedianRecord
+                : "N/A"}
+            </span>
           </div>
         </div>
 

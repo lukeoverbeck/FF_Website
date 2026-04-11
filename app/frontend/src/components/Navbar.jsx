@@ -48,9 +48,9 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   return (
     <TooltipProvider delayDuration={300}>
       <nav className="border-b bg-background sticky top-0 z-50">
-        <div className="container mx-auto h-16 flex items-center justify-between px-6 py-3">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center px-6 container mx-auto h-16">
           {/* Navigation */}
-          <div className="flex items-center gap-1 rounded-full bg-muted/40 p-1 border">
+          <div className="justify-self-start flex items-center gap-1 rounded-full bg-muted/40 p-1 border shadow">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -86,8 +86,8 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
 
           {/* Title */}
           <Link
-            to="/"
-            className="flex items-center gap-2 rounded-full p-2 hover:bg-muted/50 hover:border transition-colors"
+            to="/home"
+            className="justify-self-center flex items-center gap-2 rounded-full p-2 hover:bg-muted/50 hover:border hover:shadow transition-colors"
           >
             <span className="font-bold text-xl tracking-tight">
               Game of Inches
@@ -95,7 +95,7 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
           </Link>
 
           {/* User Actions and Profile */}
-          <div className="flex items-center gap-4">
+          <div className="justify-self-end flex items-center gap-4">
             <div className="flex items-center gap-3 pl-4 border-l">
               <div className="hidden md:flex flex-col items-end">
                 {isLoading ? (
@@ -154,6 +154,8 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
                 >
                   <option value="2025">2025</option>
                   <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
                 </select>
               </nav>
             </div>

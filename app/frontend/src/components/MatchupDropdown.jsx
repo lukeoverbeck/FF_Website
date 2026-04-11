@@ -20,7 +20,14 @@ const LINEUP_SLOTS = [
   "DST",
 ];
 
-const MatchupDropdown = ({ userPlayers, opponentPlayers }) => {
+const MatchupDropdown = ({
+  userPlayers,
+  opponentPlayers,
+  userScore,
+  opponentScore,
+  isWin,
+  isTie,
+}) => {
   const splitIntoStartersAndBench = (players) => {
     const unassigned = [...players];
     const starters = [];
@@ -124,9 +131,11 @@ const MatchupDropdown = ({ userPlayers, opponentPlayers }) => {
         {/* Opponent Player Name */}
         <TableCell className="py-4">
           {opponentIsEmpty ? (
-            <span className="text-slate-300 italic text-sm">Empty Slot</span>
+            <div className="flex items-center justify-end">
+              <span className="text-slate-300 italic text-sm">Empty Slot</span>
+            </div>
           ) : (
-            <div className="flex items-center gap-2 justify-end w-full">
+            <div className="flex items-center gap-2 justify-end">
               <span className="text-[10px] text-muted-foreground font-medium uppercase">
                 {opponentPlayer.pos}-{opponentPlayer.team}
               </span>
@@ -145,20 +154,20 @@ const MatchupDropdown = ({ userPlayers, opponentPlayers }) => {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-none">
-            <TableHead className="text-xs font-bold uppercase text-muted-foreground">
-              Luke O. Players
+            <TableHead className="w-[35%] text-xs font-bold uppercase text-muted-foreground">
+              Your Players
             </TableHead>
-            <TableHead className="w-20 text-xs text-center font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-muted-foreground">
               Pts
             </TableHead>
-            <TableHead className="w-15 text-center text-xs font-black uppercase text-blue-600 bg-slate-100/50">
+            <TableHead className="w-[6%] text-center text-xs font-black uppercase text-blue-700">
               Pos
             </TableHead>
-            <TableHead className="w-20 text-xs text-center font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-muted-foreground">
               Pts
             </TableHead>
-            <TableHead className="text-right text-xs font-bold uppercase text-muted-foreground">
-              Team 2
+            <TableHead className="w-[35%] text-right text-xs font-bold uppercase text-muted-foreground">
+              Opponent Players
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -173,6 +182,43 @@ const MatchupDropdown = ({ userPlayers, opponentPlayers }) => {
               `starter-${i}`
             )
           )}
+
+          {/* Total Score Row */}
+          <TableRow className="hover:bg-transparent border-none">
+            <TableCell className="py-3" />
+            <TableCell className="text-center py-3">
+              <span
+                className={`text-lg font-mono font-black ${
+                  isWin
+                    ? "text-green-700"
+                    : isTie
+                    ? "text-slate-900"
+                    : "text-slate-500"
+                }`}
+              >
+                {userScore.toFixed(2)}
+              </span>
+            </TableCell>
+            <TableCell className="text-center py-3">
+              <span className="text-[10px] font-black uppercase text-blue-700">
+                Total
+              </span>
+            </TableCell>
+            <TableCell className="text-center py-3">
+              <span
+                className={`text-lg font-mono font-black ${
+                  isWin
+                    ? "text-slate-500"
+                    : isTie
+                    ? "text-slate-900"
+                    : "text-3xl text-red-700"
+                }`}
+              >
+                {opponentScore.toFixed(2)}
+              </span>
+            </TableCell>
+            <TableCell className="py-3" />
+          </TableRow>
 
           {/* Bench Divider */}
           {longestBench > 0 && (

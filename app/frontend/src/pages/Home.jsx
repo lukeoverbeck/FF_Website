@@ -19,7 +19,7 @@ const settingsConfig = {
   scoring_type: { label: "Scoring System", formatter: (val) => val },
 };
 
-const Home = () => {
+const Home = ({ year }) => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
   const [highlight, setHighlight] = useState(null);
@@ -27,7 +27,7 @@ const Home = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    authFetch("/api/home_dashboard/2025", {
+    authFetch(`/api/home_dashboard/${year}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -67,7 +67,7 @@ const Home = () => {
         setHighlight(data.manager_highlight);
         setIsLoading(false);
       });
-  }, []);
+  }, [year]);
 
   return (
     <>
@@ -77,7 +77,7 @@ const Home = () => {
           {/* Intro section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch bg-white p-6 rounded-xl shadow">
             {/* Left Column: Text */}
-            <div className="flex flex-col border p-6 rounded-lg gap-2">
+            <div className="flex flex-col p-6 rounded-lg gap-2">
               <h1 className="text-3xl font-bold">
                 Welcome to the Game of Inches Fantasy Home Page!
               </h1>
@@ -88,7 +88,7 @@ const Home = () => {
             </div>
 
             {/* Right Column: Image */}
-            <figure className="overflow-hidden rounded-xl shadow-lg h-64 md:h-full">
+            <figure className="overflow-hidden rounded-xl h-64 md:h-full">
               <img
                 src={footballImage}
                 alt="Fantasy Football League"
@@ -109,14 +109,14 @@ const Home = () => {
               settingsCards.map((card) => (
                 <SettingsCard
                   key={card.id}
-                  className="col-span-12 md:col-span-3"
+                  className="col-span-12 md:col-span-3 shadow"
                   {...card}
                 />
               ))
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch bg-white p-6 rounded-xl shadow">
-            <div className="flex flex-col gap-5 max-w-lg mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch rounded-xl">
+            <div className="col-span-2 md:col-span-1 flex flex-col gap-5">
               {isLoading ? (
                 <>
                   <SkeletonCard className="h-24" />
@@ -128,7 +128,7 @@ const Home = () => {
                 winnersCards.map((card) => (
                   <WinnerCard
                     key={card.id} // Use the season/year as the unique key
-                    className=""
+                    className="col-span-2 md:col-span-1 shadow"
                     {...card}
                   />
                 ))
