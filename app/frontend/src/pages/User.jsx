@@ -10,17 +10,28 @@ const User = ({ year, currentRosterId }) => {
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!currentRosterId) return; // Don't fetch until we have the roster ID
     setIsLoading(true);
+    setError(null); // Reset error state before fetching
     authFetch(`/api/user_dashboard/${year}/${currentRosterId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(
+              err.detail || "Failed to fetch user dashboard data"
+            );
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
         console.log(data);
         const user = data.roster_info;
@@ -83,8 +94,27 @@ const User = ({ year, currentRosterId }) => {
 
         setMatchupsData(formattedMatchupsArray);
         setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
       });
   }, [year, currentRosterId]); // Runs every time the year OR user changes
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-100">
+        <div className="container mx-auto p-6 flex items-center justify-center">
+          <div className="text-center space-y-2">
+            <p className="text-lg font-semibold text-slate-700">
+              Something went wrong
+            </p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

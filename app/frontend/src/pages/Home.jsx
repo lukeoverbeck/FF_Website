@@ -24,16 +24,27 @@ const Home = ({ year }) => {
   const [winnersCards, setWinnersCards] = useState([]);
   const [highlight, setHighlight] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
+    setError(null);
     authFetch(`/api/home_dashboard/${year}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(
+              err.detail || "Failed to fetch home dashboard data"
+            );
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
         const filteredSettingsKeys = Object.keys(data.settings).filter(
           (key) => key !== "season"
@@ -66,8 +77,27 @@ const Home = ({ year }) => {
         setWinnersCards(formattedWinnersArray);
         setHighlight(data.manager_highlight);
         setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
       });
   }, [year]);
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-100">
+        <div className="container mx-auto p-6 flex items-center justify-center">
+          <div className="text-center space-y-2">
+            <p className="text-lg font-semibold text-slate-700">
+              Something went wrong
+            </p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

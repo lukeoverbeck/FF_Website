@@ -1,10 +1,11 @@
 from google.cloud import bigquery
-from fastapi import FastAPI, HTTPException, Depends, Header, Query
+from google.cloud import exceptions as gcp_exceptions
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from schemas import HomeDashboard, MatchupComparison, UserDashboard, MatchupEntry, LoginRequest, Managers, ManagerHighlight, Navbar, RosterMapping
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
-from jose import jwt, JWTError
+from jose import jwt
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
@@ -45,11 +46,11 @@ async def get_navbar(roster_id: int, season: int,  user=Depends(require_auth)):
         ]
     )
 
-    # Execute the query
-    query_job = client.query(query, job_config=job_config)
-
-    # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
-    results = list(query_job.result())
+    try:
+        query_job = client.query(query, job_config=job_config)
+        results = list(query_job.result())
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch navbar data")
 
     return results[0]
 
@@ -69,27 +70,41 @@ async def get_home_dashboard(season: int, user=Depends(require_auth)):
         SELECT * FROM `fantasy-league-data-engine.gold_layer.league_settings`
         WHERE season = @season_val
     """
-    league_settings_res = client.query(league_settings_query, job_config=job_config).result()
-    league_settings = next(league_settings_res, None)
+    try:
+        league_settings_res = client.query(league_settings_query, job_config=job_config).result()
+        league_settings = next(league_settings_res, None)
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch league settings")
     if league_settings is None:
-        raise ValueError(f"No league settings found for season {season}")
+        raise HTTPException(status_code=404, detail=f"No league settings found for season {season}")
 
     # Query 2: League Winners (List of Objects)
     league_winners_query = """
         SELECT * FROM `fantasy-league-data-engine.gold_layer.league_winners`
         ORDER BY season DESC
     """
-    league_winners_res = client.query(league_winners_query).result()
-    league_winners = [row for row in league_winners_res]
+    try:
+        league_winners_res = client.query(league_winners_query).result()
+        league_winners = [row for row in league_winners_res]
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch league winners")
+    if not league_winners:
+        raise HTTPException(status_code=404, detail=f"No league winners found")
 
     # Query 3: Manager Highlight (Single Object)
-    highlight_query = "SELECT * FROM `fantasy-league-data-engine.gold_layer.current_highlight`"
-    highlight_res = client.query(highlight_query).result()
+    try:
+        highlight_query = "SELECT * FROM `fantasy-league-data-engine.gold_layer.current_highlight`"
+        highlight_res = client.query(highlight_query).result()
+        highlight = next(iter(highlight_res), None)
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch manager highlight")
+    if highlight is None:
+        raise HTTPException(status_code=404, detail=f"No manager highlight found")
 
     return {
         "settings": league_settings,
         "league_winners": league_winners,
-        "manager_highlight": list(highlight_res)[0]
+        "manager_highlight": highlight
     }
 
 @app.get("/api/user_dashboard/{season}/{roster_id}", response_model=UserDashboard)
@@ -110,10 +125,13 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         WHERE season = @season_val
         AND roster_id = @roster_id_val
     """
-    rich_roster_res = client.query(rich_roster_query, job_config=job_config).result()
-    rich_roster = next(rich_roster_res, None)
+    try:
+        rich_roster_res = client.query(rich_roster_query, job_config=job_config).result()
+        rich_roster = next(rich_roster_res, None)
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch roster data")
     if rich_roster is None:
-        raise ValueError(f"No roster found for season {season} and roster_id {roster_id}")
+        raise HTTPException(status_code=404, detail=f"No roster found for roster_id {roster_id} in season {season}")
 
     # Query 2: Matchup Bar (List of Objects). Sometimes the user is team_a and sometimes team_b, so we use CASE statements to flip the teams/scores/winner logic based on whether team_a_id or team_b_id matches the roster_id parameter
     matchup_bar_query = """
@@ -131,8 +149,13 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         WHERE season = @season_val 
         AND (team_a_id = @roster_id_val OR team_b_id = @roster_id_val)
     """
-    matchup_bar_res = client.query(matchup_bar_query, job_config=job_config).result()
-    all_matchup_bars = [row for row in matchup_bar_res]
+    try:
+        matchup_bar_res = client.query(matchup_bar_query, job_config=job_config).result()
+        all_matchup_bars = [row for row in matchup_bar_res]
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch matchup bars")
+    if not all_matchup_bars:
+        raise HTTPException(status_code=404, detail=f"No matchups found for roster_id {roster_id} in season {season}")
 
     # Grab all the opponent ids from the matchup bars to use in the next query to get the matchup dropdown details for both the user and opponent teams. We need to get all the players for the week of the matchup, then we will split them into user vs opponent teams in Python logic. We use a set to avoid duplicates, then convert back to a list for the query parameter
     all_involved_ids = {roster_id}
@@ -154,22 +177,30 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         WHERE season = @season_val
         AND roster_id IN UNNEST(@involved_ids)
     """
-    matchup_dropdown_res = client.query(matchup_dropdown_query, job_config=new_job_config).result()
-    all_matchup_dropdowns = [row for row in matchup_dropdown_res]
+    try:
+        matchup_dropdown_res = client.query(matchup_dropdown_query, job_config=new_job_config).result()
+        all_matchup_dropdowns = [row for row in matchup_dropdown_res]
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch matchup dropdown details")
+    if not all_matchup_dropdowns:
+        raise HTTPException(status_code=404, detail=f"No matchup dropdown details found for roster_id {roster_id} in season {season}")
     
-    combined_matchups = []
-    for bar in all_matchup_bars:
-        # Filter players by week of the matchup bar
-        week_players = [p for p in all_matchup_dropdowns if p.week == bar.week]
+    try:
+        combined_matchups = []
+        for bar in all_matchup_bars:
+            # Filter players by week of the matchup bar
+            week_players = [p for p in all_matchup_dropdowns if p.week == bar.week]
 
-        # Split the players into user team vs opponent team based on roster_id
-        comparison = MatchupComparison(
-            user_team = [p for p in week_players if p.roster_id == roster_id],
-            opponent_team = [p for p in week_players if p.roster_id == bar.opponent_id]
-        )
+            # Split the players into user team vs opponent team based on roster_id
+            comparison = MatchupComparison(
+                user_team = [p for p in week_players if p.roster_id == roster_id],
+                opponent_team = [p for p in week_players if p.roster_id == bar.opponent_id]
+            )
 
-        # Combine the players with the matchup bar info into a single object for the frontend to consume
-        combined_matchups.append(MatchupEntry(summary=bar, details=comparison))
+            # Combine the players with the matchup bar info into a single object for the frontend to consume
+            combined_matchups.append(MatchupEntry(summary=bar, details=comparison))
+    except Exception:
+        raise HTTPException(status_code=500, detail=f"Failed to combine matchup data")
 
     return {
         "roster_info": rich_roster,
@@ -191,45 +222,53 @@ def login(body: LoginRequest):
         ]
     )
 
-    results = client.query(password_query, job_config=job_config).result()
-    rows = list(results)
-
+    try:
+        results = client.query(password_query, job_config=job_config).result()
+        rows = list(results)
+    except gcp_exceptions.GoogleCloudError as e:
+        raise HTTPException(status_code=503, detail=f"Authentication service unavailable: {str(e)}")
     if not rows:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    password_bytes = body.password.encode("utf-8")
-    hash_from_db = rows[0]["password_hash"].encode("utf-8")
-
-    if not bcrypt.checkpw(password_bytes, hash_from_db):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    try:
+        password_bytes = body.password.encode("utf-8")
+        hash_from_db = rows[0]["password_hash"].encode("utf-8")
+        if not bcrypt.checkpw(password_bytes, hash_from_db):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+    except HTTPException:
+        raise # Raise the 401 up
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error verifying credentials: {str(e)}")
     
-    now_utc = datetime.now(timezone.utc)
-    to_encode = {
-        "sub": body.username,
-        "iat": now_utc,
-        "exp": now_utc + timedelta(hours=8)
-    }
-    
-    token = jwt.encode(
-        to_encode,
-        SECRET_KEY,
-        algorithm="HS256"
-    )
+    try:
+        now_utc = datetime.now(timezone.utc)
+        to_encode = {
+            "sub": body.username,
+            "iat": now_utc,
+            "exp": now_utc + timedelta(hours=8)
+        }
+        
+        token = jwt.encode(
+            to_encode,
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating authentication token: {str(e)}")
 
     return { "token": token }
 
 # Grab all the managers from 2025
 @app.get("/api/managers/2025", response_model=list[Managers])
 async def get_managers(user=Depends(require_auth)):
-# async def get_managers():
     # SQL query with placeholder for season (@)
     query = "SELECT display_name, team_name, total_wins, total_losses FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = 2025"
 
-    # Execute the query
-    query_job = client.query(query)
-
-    # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
-    results = query_job.result()
+    try:
+        query_job = client.query(query)
+        results = query_job.result()
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch managers")
 
     return [row for row in results]
 
@@ -255,11 +294,13 @@ async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_au
         ]
     )
 
-    # Execute the query
-    query_job = client.query(query, job_config=job_config)
-
-    # Wait for the query to finish and get the results. Returns an interator of Row objects, which can be converted to dicts
-    results = query_job.result()
+    try:
+        query_job = client.query(query, job_config=job_config)
+        query_job.result()
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to update manager highlight")
+    except Exception:
+        raise HTTPException(status_code=500, detail=f"Unexpected error updating manager highlight")
 
     return {"status": "success"}
 
@@ -279,6 +320,12 @@ async def get_roster_id(season: int, user=Depends(require_auth)):
         ]
     )
 
-    results = client.query(query, job_config=job_config).result()
+    try:
+        results = client.query(query, job_config=job_config).result()
+        results_list = list(results)
+    except gcp_exceptions.GoogleCloudError:
+        raise HTTPException(status_code=503, detail=f"Failed to fetch roster mapping")
+    if not results_list:
+        raise HTTPException(status_code=404, detail=f"No roster found for user {user['sub']} in season {season}")
 
-    return list(results)[0]
+    return results_list[0]

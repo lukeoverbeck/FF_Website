@@ -8,27 +8,50 @@ const Commissioner = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
+  const [error, setError] = useState(null);
 
   // Fetch all managers
   useEffect(() => {
     setIsLoading(true);
+    setError(null);
 
+    // Hardcoded year because it is the most recent data
     authFetch("/api/managers/2025", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(err.detail || "Failed to fetch managers");
+          });
+        }
+        return res.json();
+      })
       .then((data) => {
         setManagers(data);
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error(err);
+        setError(err.message);
         setIsLoading(false);
       });
   }, []);
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-6">
+        <div className="text-center space-y-2">
+          <p className="text-lg font-semibold text-slate-700">
+            Something went wrong
+          </p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+        </div>
+      </main>
+    );
+  }
 
   // When a display name is selected, populate team name and record from the list
   const handleManagerSelect = (e) => {
@@ -63,17 +86,23 @@ const Commissioner = () => {
         }),
       });
 
-      // authFetch returns the Response object (Option A from our earlier chat)
       if (res && res.ok) {
-        setSaveStatus("success");
+        setSaveStatus({
+          type: "success",
+          message: "Manager highlight updated successfully.",
+        });
       } else {
-        // Handles 400, 404, 500 errors
-        setSaveStatus("error");
+        const err = await res.json(); // ← read the actual error from FastAPI
+        setSaveStatus({
+          type: "error",
+          message: err.detail || "Something went wrong. Please try again.",
+        });
       }
-    } catch (error) {
-      // Handles network crashes (e.g., Server is down)
-      console.error("Save failed:", error);
-      setSaveStatus("error");
+    } catch (err) {
+      setSaveStatus({
+        type: "error",
+        message: "Unable to reach the server. Please check your connection.",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -168,14 +197,16 @@ const Commissioner = () => {
           </div>
 
           {/* Status feedback */}
-          {saveStatus === "success" && (
-            <p className="text-sm text-green-600 font-medium">
-              ✓ Manager highlight updated successfully.
-            </p>
-          )}
-          {saveStatus === "error" && (
-            <p className="text-sm text-red-500 font-medium">
-              Something went wrong. Please try again.
+          {saveStatus && (
+            <p
+              className={`text-sm font-medium ${
+                saveStatus.type === "success"
+                  ? "text-green-600"
+                  : "text-red-500"
+              }`}
+            >
+              {saveStatus.type === "success" ? "✓ " : "✗ "}
+              {saveStatus.message}
             </p>
           )}
 
