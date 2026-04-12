@@ -1,28 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authFetch } from "../lib/utils";
 
 const LoginPage = ({ setToken }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    const res = await authFetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      setToken(data.token);
-      navigate("/home");
-    } else {
-      setError(data.detail);
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        setToken(data.token);
+        navigate("/home");
+      } else if (res.status === 503) {
+        setError("Service temporarily unavailable. Please try again later.");
+      } else {
+        setError(data.detail || "Invalid credentials");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -33,28 +44,32 @@ const LoginPage = ({ setToken }) => {
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          className="w-full px-4 py-2.5 border rounded-lg text-sm text-slate-700 placeholder-slate-400"
-        />
+        <form className="flex flex-col gap-1">
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            className="w-full px-4 py-2.5 border rounded-lg text-sm text-slate-700 placeholder-slate-400"
+          />
 
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full px-4 py-2.5 border rounded-lg text-sm text-slate-700 placeholder-slate-400 "
-        />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full px-4 py-2.5 border rounded-lg text-sm text-slate-700 placeholder-slate-400 "
+          />
 
-        <button
-          onClick={handleSubmit}
-          className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-lg mt-2"
-        >
-          Sign In
-        </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            onClick={handleSubmit}
+            className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-lg mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </button>
+        </form>
       </div>
     </main>
   );

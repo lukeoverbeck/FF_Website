@@ -42,9 +42,11 @@ function App() {
   const [year, setYear] = useState("2025");
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [rosterId, setRosterId] = useState(null);
+  const [rosterError, setRosterError] = useState(null);
 
   useEffect(() => {
     if (token) {
+      setRosterError(null);
       // Fetch the specific roster mapping for this user + this year
       authFetch(`/api/roster_mapping/${year}`, {
         method: "GET",
@@ -52,9 +54,19 @@ function App() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res || !res.ok) {
+            return res.json().then((err) => {
+              throw new Error(err.detail || "Failed to fetch roster mapping");
+            });
+          }
+          return res.json();
+        })
         .then((data) => {
           setRosterId(data.roster_id);
+        })
+        .catch((err) => {
+          setRosterError(err.message);
         });
     }
   }, [year, token]); // Runs every time the year OR user changes
@@ -69,6 +81,11 @@ function App() {
             setToken={setToken}
             currentRosterId={rosterId}
           />
+        )}
+        {rosterError && (
+          <div className="container mx-auto px-6 py-3">
+            <p className="text-sm text-red-500">{rosterError}</p>
+          </div>
         )}
         <Routes>
           <Route
