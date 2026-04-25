@@ -31,9 +31,6 @@ const Home = memo(({ year }) => {
     setError(null);
     authFetch(`/api/home_dashboard/${year}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
     })
       .then((res) => {
         if (!res.ok) {

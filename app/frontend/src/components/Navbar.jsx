@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users, LogOut } from "lucide-react";
+import { Home, Users, LogOut, Crown } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { authFetch, logToBackend } from "../lib/utils";
 import SkeletonCard from "./SkeletonCard";
+import { jwtDecode } from "jwt-decode";
 
 const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const token = localStorage.getItem("token");
+  const isCommissioner = token && jwtDecode(token).role === "commissioner";
 
   useEffect(() => {
     if (!currentRosterId) return; // Don't fetch until we have the roster ID
@@ -30,9 +33,6 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
     setError(null);
     authFetch(`/api/navbar/${currentRosterId}/${currentYear}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
     })
       .then((res) => {
         if (!res.ok) {
@@ -99,6 +99,24 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
                 <p>User Dashboard</p>
               </TooltipContent>
             </Tooltip>
+
+            {isCommissioner && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-full"
+                    onClick={() => navigate("/commissioner")}
+                  >
+                    <Crown className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Commissioner</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
 
           {/* Title */}

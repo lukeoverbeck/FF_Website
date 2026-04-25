@@ -18,9 +18,6 @@ const User = memo(({ year, currentRosterId }) => {
     setError(null); // Reset error state before fetching
     authFetch(`/api/user_dashboard/${year}/${currentRosterId}`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
     })
       .then((res) => {
         if (!res.ok) {
