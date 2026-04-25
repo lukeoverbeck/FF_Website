@@ -1,0 +1,157 @@
+2026-04-20 19:13:21 | INFO | RID:  | POST /api/login | Status: 200 | Time: 1617.39ms
+2026-04-20 19:13:21 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:13:23 | INFO | RID:  | GET /api/roster_mapping/2025 | Status: 200 | Time: 1566.22ms
+2026-04-20 19:13:23 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:13:23 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:13:23 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:13:24 | INFO | Fetched league settings for season=2025
+2026-04-20 19:13:25 | INFO | Fetched league winners: 4 records
+2026-04-20 19:13:25 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:13:26 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:13:26 | INFO | Fetched league settings for season=2025
+2026-04-20 19:13:28 | INFO | Fetched league winners: 4 records
+2026-04-20 19:13:29 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:13:29 | INFO | RID:  | GET /api/home_dashboard/2025 | Status: 200 | Time: 5966.26ms
+2026-04-20 19:13:29 | INFO | RID:  | GET /api/home_dashboard/2025 | Status: 200 | Time: 5969.46ms
+2026-04-20 19:13:29 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:13:29 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:13:30 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:13:30 | INFO | RID:  | GET /api/navbar/1/2025 | Status: 200 | Time: 904.33ms
+2026-04-20 19:17:33 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:17:33 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:17:33 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:17:33 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:17:33 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:17:34 | INFO | Fetched league settings for season=2025
+2026-04-20 19:17:35 | INFO | Fetched league winners: 4 records
+2026-04-20 19:17:36 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:17:37 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:17:38 | INFO | Fetched league settings for season=2025
+2026-04-20 19:17:39 | INFO | Fetched league winners: 4 records
+2026-04-20 19:17:40 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:17:40 | INFO | RID: 7e7bfb2a | GET /api/home_dashboard/2025 | Status: 200 | Time: 7665.70ms
+2026-04-20 19:17:41 | INFO | RID: 3c1ea68d | GET /api/roster_mapping/2025 | Status: 200 | Time: 7667.72ms
+2026-04-20 19:17:41 | INFO | RID: d87b1a76 | GET /api/home_dashboard/2025 | Status: 200 | Time: 7668.65ms
+2026-04-20 19:17:41 | INFO | RID: d7c3f3c5 | GET /api/roster_mapping/2025 | Status: 200 | Time: 7664.24ms
+2026-04-20 19:17:41 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:17:41 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:17:41 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:17:41 | INFO | RID: d30e628c | GET /api/navbar/1/2025 | Status: 200 | Time: 715.22ms
+2026-04-20 19:19:12 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:19:12 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:19:13 | INFO | Fetched league settings for season=2025
+2026-04-20 19:19:14 | INFO | Fetched league winners: 4 records
+2026-04-20 19:19:15 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:19:15 | INFO | RID: 3963510c | GET /api/home_dashboard/2025 | Status: 200 | Time: 3407.33ms
+2026-04-20 19:19:15 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:19:16 | INFO | RID: 66356925 | GET /api/roster_mapping/2025 | Status: 200 | Time: 841.86ms
+2026-04-20 19:19:16 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:19:16 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:19:16 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:19:17 | INFO | Fetched league settings for season=2025
+2026-04-20 19:19:18 | INFO | Fetched league winners: 4 records
+2026-04-20 19:19:18 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:19:19 | INFO | RID: 0ade6252 | GET /api/home_dashboard/2025 | Status: 200 | Time: 2803.86ms
+2026-04-20 19:19:19 | INFO | RID: 1c5a62e7 | GET /api/roster_mapping/2025 | Status: 200 | Time: 2804.72ms
+2026-04-20 19:19:19 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:19:19 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:19:20 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:19:20 | INFO | RID: 47d36483 | GET /api/navbar/1/2025 | Status: 200 | Time: 715.62ms
+2026-04-20 19:24:08 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:24:08 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:24:08 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:24:09 | INFO | Fetched league settings for season=2025
+2026-04-20 19:24:10 | INFO | Fetched league winners: 4 records
+2026-04-20 19:24:11 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:24:12 | INFO | RID: 2d05ed47 | GET /api/home_dashboard/2025 | Status: 200 | Time: 3544.28ms
+2026-04-20 19:24:12 | INFO | RID: 5a9fe47f | GET /api/roster_mapping/2025 | Status: 200 | Time: 3542.82ms
+2026-04-20 19:24:12 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:24:12 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:24:13 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:24:13 | INFO | RID: d8ff9ada | GET /api/navbar/1/2025 | Status: 200 | Time: 1030.59ms
+2026-04-20 19:26:59 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:26:59 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:26:59 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:27:00 | INFO | Fetched league settings for season=2025
+2026-04-20 19:27:00 | INFO | Fetched league winners: 4 records
+2026-04-20 19:27:01 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:27:03 | INFO | RID: 7c2603c6 | GET /api/home_dashboard/2025 | Status: 200 | Time: 4005.66ms
+2026-04-20 19:27:03 | INFO | RID: eaa5de1c | GET /api/roster_mapping/2025 | Status: 200 | Time: 4007.62ms
+2026-04-20 19:27:03 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:27:03 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:27:03 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:27:03 | INFO | RID: f8aa3b71 | GET /api/navbar/1/2025 | Status: 200 | Time: 783.11ms
+2026-04-20 19:27:19 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:27:22 | INFO | RID: a2d297e4 | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 3085.81ms
+2026-04-20 19:27:35 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:27:35 | INFO | RID: cef002b3 | GET /api/roster_mapping/2025 | Status: 200 | Time: 709.71ms
+2026-04-20 19:27:35 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:27:35 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:27:36 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:27:36 | INFO | RID: f85bdabe | GET /api/navbar/1/2025 | Status: 200 | Time: 890.99ms
+2026-04-20 19:27:36 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:27:39 | INFO | RID: 093edc56 | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 2370.12ms
+2026-04-20 19:28:00 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:28:01 | INFO | RID: 766a415b | GET /api/roster_mapping/2025 | Status: 200 | Time: 926.78ms
+2026-04-20 19:28:01 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:28:01 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:28:01 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:28:02 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:28:04 | INFO | RID: 4d2baa7e | GET /api/navbar/1/2025 | Status: 200 | Time: 3189.40ms
+2026-04-20 19:28:04 | INFO | RID: 4fc6a90d | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 3189.75ms
+2026-04-20 19:43:53 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:43:54 | INFO | RID: 5a87abf9 | GET /api/roster_mapping/2025 | Status: 200 | Time: 1283.04ms
+2026-04-20 19:43:55 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:43:55 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:43:56 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:43:56 | INFO | RID: 5e8f5123 | GET /api/navbar/1/2025 | Status: 200 | Time: 1218.13ms
+2026-04-20 19:44:08 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:09 | INFO | RID: c57fb338 | GET /api/roster_mapping/2025 | Status: 200 | Time: 1112.22ms
+2026-04-20 19:44:09 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:09 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:10 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:44:10 | INFO | RID: b57dd888 | GET /api/navbar/1/2025 | Status: 200 | Time: 842.55ms
+2026-04-20 19:44:10 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:10 | INFO | Fetching user dashboard for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:11 | INFO | Fetched rich roster for roster_id=1, season=2025
+2026-04-20 19:44:12 | INFO | Fetched matchup bars for roster_id=1, season=2025: 14 records
+2026-04-20 19:44:13 | INFO | Fetched matchup dropdown details for roster_id=1, season=2025: 2804 records
+2026-04-20 19:44:13 | INFO | Successfully combined matchup data for roster_id=1, season=2025
+2026-04-20 19:44:13 | INFO | RID: a884a4e9 | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 2850.18ms
+2026-04-20 19:44:14 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:15 | INFO | RID: 57572847 | GET /api/roster_mapping/2025 | Status: 200 | Time: 954.97ms
+2026-04-20 19:44:15 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:15 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:16 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:44:16 | INFO | RID: f48be0a8 | GET /api/navbar/1/2025 | Status: 200 | Time: 952.31ms
+2026-04-20 19:44:16 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:16 | INFO | Fetching user dashboard for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:18 | INFO | Fetched rich roster for roster_id=1, season=2025
+2026-04-20 19:44:19 | INFO | Fetched matchup bars for roster_id=1, season=2025: 14 records
+2026-04-20 19:44:21 | INFO | Fetched matchup dropdown details for roster_id=1, season=2025: 2804 records
+2026-04-20 19:44:21 | INFO | Successfully combined matchup data for roster_id=1, season=2025
+2026-04-20 19:44:21 | INFO | RID: 101cdf53 | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 4568.67ms
+2026-04-20 19:44:24 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:24 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:24 | INFO | Fetching home dashboard for season=2025, user=lukeoverbeck
+2026-04-20 19:44:24 | INFO | Fetched league settings for season=2025
+2026-04-20 19:44:25 | INFO | Fetched league winners: 4 records
+2026-04-20 19:44:26 | INFO | Fetched manager highlight: ngriese4
+2026-04-20 19:44:26 | INFO | RID: 1404447d | GET /api/home_dashboard/2025 | Status: 200 | Time: 2922.51ms
+2026-04-20 19:44:26 | INFO | RID: 69773969 | GET /api/roster_mapping/2025 | Status: 200 | Time: 2922.38ms
+2026-04-20 19:44:26 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:26 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:27 | INFO | Fetched managers for season 2025: 12 records
+2026-04-20 19:44:28 | INFO | RID: 9e142093 | GET /api/managers/2025 | Status: 200 | Time: 1818.01ms
+2026-04-20 19:44:28 | INFO | RID: 056650e4 | GET /api/roster_mapping/2025 | Status: 200 | Time: 1819.92ms
+2026-04-20 19:44:28 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:28 | INFO | Fetching navbar for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:29 | INFO | Successfully fetched navbar for roster_id=1, season=2025
+2026-04-20 19:44:29 | INFO | RID: 1607e194 | GET /api/navbar/1/2025 | Status: 200 | Time: 855.47ms
+2026-04-20 19:44:40 | INFO | Authenticated request from user: lukeoverbeck
+2026-04-20 19:44:40 | INFO | Fetching user dashboard for roster_id=1, season=2025, user=lukeoverbeck
+2026-04-20 19:44:41 | INFO | Fetched rich roster for roster_id=1, season=2025
+2026-04-20 19:44:41 | INFO | Fetched matchup bars for roster_id=1, season=2025: 14 records
+2026-04-20 19:44:42 | INFO | Fetched matchup dropdown details for roster_id=1, season=2025: 2804 records
+2026-04-20 19:44:42 | INFO | Successfully combined matchup data for roster_id=1, season=2025
+2026-04-20 19:44:42 | INFO | RID: f968fb9a | GET /api/user_dashboard/2025/1 | Status: 200 | Time: 2191.39ms

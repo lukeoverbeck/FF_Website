@@ -111,3 +111,7 @@ class Navbar(BigQueryModel):
 
 class RosterMapping(BigQueryModel):
     roster_id: int
+
+class FrontendLog(BigQueryModel):
+    level: str
+    message: str

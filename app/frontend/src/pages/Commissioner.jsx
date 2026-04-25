@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../lib/utils";
+import { authFetch, logToBackend } from "../lib/utils";
 
 const Commissioner = () => {
   const [managers, setManagers] = useState([]);
@@ -35,6 +35,7 @@ const Commissioner = () => {
         setIsLoading(false);
       })
       .catch((err) => {
+        logToBackend("error", `Failed to fetch managers — ${err.message}`);
         setError(err.message);
         setIsLoading(false);
       });
@@ -99,6 +100,10 @@ const Commissioner = () => {
         });
       }
     } catch (err) {
+      logToBackend(
+        "error",
+        `Failed to update manager highlight for display_name=${selectedManager?.display_name} — ${err.message}`
+      );
       setSaveStatus({
         type: "error",
         message: "Unable to reach the server. Please check your connection.",
@@ -107,10 +112,6 @@ const Commissioner = () => {
       setIsSaving(false);
     }
   };
-
-  const record = selectedManager
-    ? `${selectedManager.wins}-${selectedManager.losses}`
-    : "";
 
   return (
     <>

@@ -1,8 +1,8 @@
 import SettingsCard from "../components/SettingsCard";
 import WinnerCard from "../components/WinnerCard";
 import footballImage from "../assets/football.jpg";
-import { useState, useEffect } from "react";
-import { authFetch } from "../lib/utils";
+import { useState, useEffect, memo } from "react";
+import { authFetch, logToBackend } from "../lib/utils";
 import ManagerHighlight from "../components/ManagerHighlight";
 import SkeletonCard from "../components/SkeletonCard";
 
@@ -19,7 +19,7 @@ const settingsConfig = {
   scoring_type: { label: "Scoring System", formatter: (val) => val },
 };
 
-const Home = ({ year }) => {
+const Home = memo(({ year }) => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
   const [highlight, setHighlight] = useState(null);
@@ -71,14 +71,16 @@ const Home = ({ year }) => {
           };
         });
 
-        console.log(data.manager_highlight);
-
         setSettingsCards(formattedSettingsArray);
         setWinnersCards(formattedWinnersArray);
         setHighlight(data.manager_highlight);
         setIsLoading(false);
       })
       .catch((err) => {
+        logToBackend(
+          "error",
+          `Failed to fetch home dashboard for season=${year} — ${err.message}`
+        );
         setError(err.message);
         setIsLoading(false);
       });
@@ -170,6 +172,6 @@ const Home = ({ year }) => {
       </main>
     </>
   );
-};
+});
 
 export default Home;

@@ -11,7 +11,7 @@ import {
 } from "./ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { authFetch } from "../lib/utils";
+import { authFetch, logToBackend } from "../lib/utils";
 import SkeletonCard from "./SkeletonCard";
 
 const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
@@ -47,6 +47,10 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
         setIsLoading(false);
       })
       .catch((err) => {
+        logToBackend(
+          "error",
+          `Failed to fetch navbar for roster_id=${currentRosterId}, season=${currentYear} — ${err.message}`
+        );
         setError(err.message);
         setIsLoading(false);
       });
