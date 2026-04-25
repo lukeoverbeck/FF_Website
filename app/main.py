@@ -67,6 +67,12 @@ def require_auth(auth: HTTPAuthorizationCredentials = Depends(security)):
         logger.error(f"Auth failed: unexpected error — {e}", exc_info=True)
         raise HTTPException(status_code=401, detail="Not authenticated")
 
+def require_commissioner(auth: HTTPAuthorizationCredentials = Depends(security)):
+    payload = require_auth(auth)
+    if payload.get("role") != "commissioner":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return payload
+
 @app.get("/api/navbar/{roster_id}/{season}", response_model=Navbar)
 async def get_navbar(roster_id: int, season: int,  user=Depends(require_auth)):
     logger.info(f"Fetching navbar for roster_id={roster_id}, season={season}, user={user['sub']}")
@@ -272,7 +278,7 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
 @app.post("/api/login")
 def login(body: LoginRequest):
     password_query = """
-        SELECT password_hash
+        SELECT password_hash, role
         FROM `fantasy-league-data-engine.gold_layer.users`
         WHERE username = @username
         LIMIT 1
@@ -307,11 +313,14 @@ def login(body: LoginRequest):
         logger.error(f"Error verifying credentials for username={body.username} — {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error verifying credentials")
     logger.info(f"Login successful for username={body.username}")
+
+    role_from_db = rows[0]["role"]
     
     try:
         now_utc = datetime.now(timezone.utc)
         to_encode = {
             "sub": body.username,
+            "role": role_from_db,
             "iat": now_utc,
             "exp": now_utc + timedelta(hours=8)
         }
@@ -330,7 +339,7 @@ def login(body: LoginRequest):
 
 # Grab all the managers from 2025
 @app.get("/api/managers/2025", response_model=list[Managers])
-async def get_managers(user=Depends(require_auth)):
+async def get_managers(user=Depends(require_commissioner)):
     logger.info(f"Fetching managers for season 2025, user={user['sub']}")
 
     # SQL query with placeholder for season (@)
@@ -351,7 +360,7 @@ async def get_managers(user=Depends(require_auth)):
 
 # Update the manager highlight data
 @app.post("/api/manager_highlight")
-async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_auth)):
+async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_commissioner)):
     logger.info(f"Updating manager highlight for display_name={body.display_name}, user={user['sub']}")
 
     # SQL query with placeholder for season (@)

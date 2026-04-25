@@ -44,9 +44,11 @@ def create_user(username: str, plain_text_password: str):
 
     hashed = bcrypt.hashpw(plain_text_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
+    role = "commissioner" if username == "lukeoverbeck" else "member"
+
     errors = client.insert_rows_json(
         PASSWORD_TABLE_ID,
-        [{ "username": username, "password_hash": hashed, "created_at": datetime.now().isoformat() }]
+        [{ "username": username, "password_hash": hashed, "role": role, "created_at": datetime.now().isoformat() }]
     )
 
     if errors:

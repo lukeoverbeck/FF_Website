@@ -32,6 +32,26 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const CommissionerRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" />;
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    if (decoded.exp < currentTime) {
+      localStorage.removeItem("token");
+      return <Navigate to="/login" />;
+    }
+    if (decoded.role !== "commissioner") {
+      return <Navigate to="/home" />;
+    }
+  } catch (error) {
+    localStorage.removeItem("token");
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
+
 const CatchAll = () => {
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/home" />;
@@ -50,9 +70,6 @@ function App() {
       // Fetch the specific roster mapping for this user + this year
       authFetch(`/api/roster_mapping/${year}`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       })
         .then((res) => {
           if (!res || !res.ok) {
@@ -115,9 +132,9 @@ function App() {
           <Route
             path="/commissioner"
             element={
-              <ProtectedRoute>
+              <CommissionerRoute>
                 <Commissioner />
-              </ProtectedRoute>
+              </CommissionerRoute>
             }
           />
           <Route path="/login" element={<Login setToken={setToken} />} />

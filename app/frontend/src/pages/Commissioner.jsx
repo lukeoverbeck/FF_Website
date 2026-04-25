@@ -18,9 +18,6 @@ const Commissioner = () => {
     // Hardcoded year because it is the most recent data
     authFetch("/api/managers/2025", {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
     })
       .then((res) => {
         if (!res.ok) {
