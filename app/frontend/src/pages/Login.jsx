@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logToBackend } from "../lib/utils";
 
 const LoginPage = ({ setToken }) => {
   const [username, setUsername] = useState("");
@@ -31,6 +32,10 @@ const LoginPage = ({ setToken }) => {
         setError(data.detail || "Invalid credentials");
       }
     } catch (err) {
+      logToBackend(
+        "error",
+        `Login failed for username=${username} — ${err.message}`
+      );
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);

@@ -1,11 +1,11 @@
 import MatchupBar from "../components/MatchupBar";
 import UserInfo from "../components/UserInfo";
 import UserStats from "../components/UserStats";
-import { useState, useEffect } from "react";
-import { authFetch } from "../lib/utils";
+import { useState, useEffect, memo } from "react";
+import { authFetch, logToBackend } from "../lib/utils";
 import SkeletonCard from "../components/SkeletonCard";
 
-const User = ({ year, currentRosterId }) => {
+const User = memo(({ year, currentRosterId }) => {
   const [userInfo, setUserInfo] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
@@ -33,7 +33,6 @@ const User = ({ year, currentRosterId }) => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         const user = data.roster_info;
         setUserInfo({
           id: user.display_name, // Not really necessary here
@@ -52,8 +51,6 @@ const User = ({ year, currentRosterId }) => {
           pointsFor: user.points_for,
           pointsAgainst: user.points_against,
         });
-
-        console.log("Raw Matchups:", data.matchups);
 
         const formattedMatchupsArray = data.matchups.map((matchup) => {
           const innerUserMatchup = matchup.details.user_team.map((player) => {
@@ -90,12 +87,14 @@ const User = ({ year, currentRosterId }) => {
           };
         });
 
-        console.log("Formatted matchups:", formattedMatchupsArray);
-
         setMatchupsData(formattedMatchupsArray);
         setIsLoading(false);
       })
       .catch((err) => {
+        logToBackend(
+          "error",
+          `Failed to fetch user dashboard for roster_id=${currentRosterId}, season=${year} — ${err.message}`
+        );
         setError(err.message);
         setIsLoading(false);
       });
@@ -186,6 +185,6 @@ const User = ({ year, currentRosterId }) => {
       </main>
     </>
   );
-};
+});
 
 export default User;

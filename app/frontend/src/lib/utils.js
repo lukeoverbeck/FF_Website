@@ -27,3 +27,11 @@ export const authFetch = async (url, options = {}) => {
   // Return the raw response from the endpoint
   return response;
 };
+
+export const logToBackend = (level, message) => {
+  fetch("/api/log", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ level, message }),
+  });
+};
