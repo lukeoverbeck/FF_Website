@@ -115,6 +115,10 @@
     Opacity: bg-primary/50, text-primary/20 (Using the slash to make it see-through).
   */
 
+  --color-navy: oklch(0.18 0.04 243);
+  --color-navy-light: oklch(0.24 0.05 243);
+  --color-gold: oklch(0.75 0.15 70);
+
   /* Each line below automatically creates text-*, bg-*, border-*, and ring-* utilities */
   --color-background: var(--background);
   --color-foreground: var(--foreground);

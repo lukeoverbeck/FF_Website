@@ -109,7 +109,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Home year={year} />
+                <Home year={year} currentRosterId={rosterId} />
               </ProtectedRoute>
             }
           />
@@ -117,7 +117,7 @@ function App() {
             path="/home"
             element={
               <ProtectedRoute>
-                <Home year={year} />
+                <Home year={year} currentRosterId={rosterId} />
               </ProtectedRoute>
             }
           />

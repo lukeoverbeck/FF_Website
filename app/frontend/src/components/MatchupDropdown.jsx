@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "./ui/table";
 
-// Define the lineup slots in the order they should be displayed
 const LINEUP_SLOTS = [
   "QB",
   "RB",
@@ -32,14 +31,11 @@ const MatchupDropdown = ({
     const unassigned = [...players];
     const starters = [];
 
-    // Assign each player to the first matching lineup slot
     for (const slot of LINEUP_SLOTS) {
       const matchIndex = unassigned.findIndex(
         (player) => player.fantasy_pos === slot
       );
-
       if (matchIndex !== -1) {
-        // Use splice to remove the matched player from unassigned and add to starters
         starters.push(unassigned.splice(matchIndex, 1)[0]);
       } else {
         starters.push({
@@ -55,13 +51,11 @@ const MatchupDropdown = ({
     return { starters, bench: unassigned };
   };
 
-  // Split user and opponent players into starters and bench
   const { starters: userStarters, bench: userBench } =
     splitIntoStartersAndBench(userPlayers);
   const { starters: opponentStarters, bench: opponentBench } =
     splitIntoStartersAndBench(opponentPlayers);
 
-  // Create matchup pairs for bench players, filling in empty slots as needed. Make the dropdown as long as the longest bench
   const longestBench = Math.max(userBench.length, opponentBench.length);
   const benchMatchups = Array.from({ length: longestBench }, (_, i) => ({
     userBenchPlayer: userBench[i] || {
@@ -78,7 +72,6 @@ const MatchupDropdown = ({
     },
   }));
 
-  // Render a single row in the table
   const renderMatchupRow = (userPlayer, opponentPlayer, slotLabel, rowKey) => {
     const userIsEmpty = userPlayer.name.toLowerCase() === "none";
     const opponentIsEmpty = opponentPlayer.name.toLowerCase() === "none";
@@ -91,10 +84,10 @@ const MatchupDropdown = ({
             <span className="text-slate-300 italic text-sm">None</span>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-slate-700 gap-5">
+              <span className="font-semibold text-sm text-navy">
                 {userPlayer.name}
               </span>
-              <span className="text-[10px] text-muted-foreground font-medium uppercase">
+              <span className="text-[10px] text-slate-400 font-medium uppercase">
                 {userPlayer.pos}-{userPlayer.team}
               </span>
             </div>
@@ -105,15 +98,15 @@ const MatchupDropdown = ({
         <TableCell className="text-center py-4">
           <span
             className={`font-mono font-bold ${
-              userIsEmpty ? "text-slate-200" : "text-slate-900"
+              userIsEmpty ? "text-slate-200" : "text-navy"
             }`}
           >
             {userIsEmpty ? "0.00" : userPlayer.points.toFixed(2)}
           </span>
         </TableCell>
 
-        {/* Slot Label */}
-        <TableCell className="font-mono text-center text-xs font-bold text-slate-400 py-4">
+        {/* Slot Label — gold instead of blue */}
+        <TableCell className="font-mono text-center text-xs font-bold text-gold py-4">
           {slotLabel}
         </TableCell>
 
@@ -121,7 +114,7 @@ const MatchupDropdown = ({
         <TableCell className="text-center py-4">
           <span
             className={`font-mono font-bold ${
-              opponentIsEmpty ? "text-slate-200" : "text-slate-900"
+              opponentIsEmpty ? "text-slate-200" : "text-navy"
             }`}
           >
             {opponentIsEmpty ? "0.00" : opponentPlayer.points.toFixed(2)}
@@ -136,10 +129,10 @@ const MatchupDropdown = ({
             </div>
           ) : (
             <div className="flex items-center gap-2 justify-end">
-              <span className="text-[10px] text-muted-foreground font-medium uppercase">
+              <span className="text-[10px] text-slate-400 font-medium uppercase">
                 {opponentPlayer.pos}-{opponentPlayer.team}
               </span>
-              <span className="font-semibold text-sm text-slate-700">
+              <span className="font-semibold text-sm text-navy">
                 {opponentPlayer.name}
               </span>
             </div>
@@ -154,26 +147,25 @@ const MatchupDropdown = ({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-none">
-            <TableHead className="w-[35%] text-xs font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[35%] text-xs font-bold uppercase text-slate-400">
               Your Players
             </TableHead>
-            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-slate-400">
               Pts
             </TableHead>
-            <TableHead className="w-[6%] text-center text-xs font-black uppercase text-blue-700">
+            {/* Pos header — gold to match slot labels */}
+            <TableHead className="w-[6%] text-center text-xs font-black uppercase text-gold">
               Pos
             </TableHead>
-            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[12%] text-xs text-center font-bold uppercase text-slate-400">
               Pts
             </TableHead>
-            <TableHead className="w-[35%] text-right text-xs font-bold uppercase text-muted-foreground">
+            <TableHead className="w-[35%] text-right text-xs font-bold uppercase text-slate-400">
               Opponent Players
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {/* For each user starter, render a row. Grab the matching player from opponent starters and index
-          from LINEUP_SLOTS */}
           {userStarters.map((userPlayer, i) =>
             renderMatchupRow(
               userPlayer,
@@ -192,26 +184,27 @@ const MatchupDropdown = ({
                   isWin
                     ? "text-green-700"
                     : isTie
-                    ? "text-slate-900"
-                    : "text-slate-500"
+                    ? "text-navy"
+                    : "text-slate-400"
                 }`}
               >
                 {userScore.toFixed(2)}
               </span>
             </TableCell>
             <TableCell className="text-center py-3">
-              <span className="text-[10px] font-black uppercase text-blue-700">
+              {/* "Total" label — gold to match theme */}
+              <span className="text-[10px] font-black uppercase text-gold">
                 Total
               </span>
             </TableCell>
             <TableCell className="text-center py-3">
               <span
-                className={`text-lg font-mono font-black ${
+                className={`font-mono font-black ${
                   isWin
-                    ? "text-slate-500"
+                    ? "text-slate-400"
                     : isTie
-                    ? "text-slate-900"
-                    : "text-3xl text-red-700"
+                    ? "text-navy"
+                    : "text-2xl text-red-600"
                 }`}
               >
                 {opponentScore.toFixed(2)}
