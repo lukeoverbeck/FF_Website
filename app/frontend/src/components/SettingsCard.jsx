@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "./ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import { cn } from "../lib/utils";
 
 const SettingsCard = ({
@@ -15,11 +9,21 @@ const SettingsCard = ({
   ...props
 }) => {
   return (
-    <Card className={cn("bg-slate-50 gap-3", className)} {...props}>
-      <CardHeader className="">
-        <CardTitle>{settingsName}</CardTitle>
+    <Card
+      className={cn(
+        "bg-white border-t-4 border-gold shadow-sm flex flex-col gap-1.5 p-5",
+        className
+      )}
+      {...props}
+    >
+      <CardHeader className="p-0">
+        <CardTitle className="text-xs font-semibold tracking-widest text-slate-400 uppercase">
+          {settingsName}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="">{settingsContent}</CardContent>
+      <CardContent className="p-0">
+        <p className="text-xl font-bold text-navy">{settingsContent}</p>
+      </CardContent>
     </Card>
   );
 };

@@ -220,16 +220,9 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         raise HTTPException(status_code=404, detail=f"No matchups found for roster_id {roster_id} in season {season}")
     logger.info(f"Fetched matchup bars for roster_id={roster_id}, season={season}: {len(all_matchup_bars)} records")
 
-    # Grab all the opponent ids from the matchup bars to use in the next query to get the matchup dropdown details for both the user and opponent teams. We need to get all the players for the week of the matchup, then we will split them into user vs opponent teams in Python logic. We use a set to avoid duplicates, then convert back to a list for the query parameter
-    all_involved_ids = {roster_id}
-    for bar in all_matchup_bars:
-        all_involved_ids.add(bar.opponent_id)
-    involved_ids_list = list(all_involved_ids)
-
     new_job_config = bigquery.QueryJobConfig(
         query_parameters=[
-            bigquery.ScalarQueryParameter("season_val", "INT64", season),
-            bigquery.ArrayQueryParameter("involved_ids", "INT64", involved_ids_list)
+            bigquery.ScalarQueryParameter("season_val", "INT64", season)
         ]
     )
 
@@ -238,7 +231,6 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         SELECT *
         FROM `fantasy-league-data-engine.gold_layer.matchup_dropdown`
         WHERE season = @season_val
-        AND roster_id IN UNNEST(@involved_ids)
     """
     try:
         matchup_dropdown_res = client.query(matchup_dropdown_query, job_config=new_job_config).result()
@@ -343,7 +335,7 @@ async def get_managers(user=Depends(require_commissioner)):
     logger.info(f"Fetching managers for season 2025, user={user['sub']}")
 
     # SQL query with placeholder for season (@)
-    query = "SELECT display_name, team_name, total_wins, total_losses FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = 2025"
+    query = "SELECT display_name, team_name, total_wins, total_losses, profile_picture FROM `fantasy-league-data-engine.gold_layer.rich_rosters` WHERE season = 2025"
 
     try:
         query_job = client.query(query)
@@ -368,8 +360,8 @@ async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_co
         TRUNCATE TABLE `fantasy-league-data-engine.gold_layer.current_highlight`;
 
         INSERT INTO `fantasy-league-data-engine.gold_layer.current_highlight` 
-        (display_name, team_name, wins, losses, message) 
-        VALUES (@display_name_val, @team_name_val, @wins_val, @losses_val, @message_val);
+        (display_name, team_name, wins, losses, message, profile_picture) 
+        VALUES (@display_name_val, @team_name_val, @wins_val, @losses_val, @message_val, @profile_picture_val);
     """
 
     job_config = bigquery.QueryJobConfig(
@@ -378,7 +370,8 @@ async def post_manager_highlight(body: ManagerHighlight, user=Depends(require_co
             bigquery.ScalarQueryParameter("team_name_val", "STRING", body.team_name),
             bigquery.ScalarQueryParameter("wins_val", "INT64", body.wins),
             bigquery.ScalarQueryParameter("losses_val", "INT64", body.losses),
-            bigquery.ScalarQueryParameter("message_val", "STRING", body.message)
+            bigquery.ScalarQueryParameter("message_val", "STRING", body.message),
+            bigquery.ScalarQueryParameter("profile_picture_val", "STRING", body.profile_picture)
         ]
     )
 

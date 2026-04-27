@@ -1,44 +1,47 @@
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
 const ManagerHighlight = ({ highlight }) => {
   if (!highlight)
-    return <div className="animate-pulse bg-gray-200 h-40 rounded-lg"></div>;
+    return <div className="animate-pulse bg-white/10 h-40 rounded-lg" />;
 
-  const { display_name, team_name, wins, losses, message } = highlight;
+  const { display_name, team_name, wins, losses, message, profile_picture } =
+    highlight;
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
-      {/* Section header */}
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-bold text-slate-900">Manager Spotlight</h2>
-      </div>
-
+    <div className="flex flex-col gap-4">
       {/* Manager info row */}
-      <div className="flex items-center gap-3 border rounded-lg p-4 bg-slate-50">
-        {/* Avatar placeholder */}
-        <div className="shrink-0 w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold text-lg">
-          {display_name.charAt(0)}
-        </div>
+      <div className="flex items-center gap-3 bg-white/10 rounded-lg p-4">
+        {/* Avatar */}
+        <Avatar className="h-12 w-12 border-2 border-gold shrink-0">
+          <AvatarImage src={profile_picture} alt={display_name} />
+          <AvatarFallback className="bg-navy text-gold font-bold text-lg">
+            {display_name.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
 
         {/* Name + team */}
-        <div className="flex flex-col flex-1">
-          <span className="font-semibold text-slate-900 text-base">
-            {display_name}
-          </span>
-          <span className="text-sm text-slate-500">{team_name}</span>
+        <div className="flex flex-col flex-1 min-w-0">
+          <span className="font-bold text-white text-base">{display_name}</span>
+          <span className="text-sm text-slate-300">{team_name}</span>
         </div>
 
         {/* Record badge */}
-        <div className="flex flex-col items-center bg-slate-800 text-white rounded-lg px-4 py-2 min-w-18">
-          <span className="text-xs font-medium text-slate-300 uppercase tracking-wide">
+        <div className="flex flex-col items-center bg-gold text-navy rounded-lg px-4 py-2 min-w-18 shrink-0">
+          <span className="text-xs font-bold uppercase tracking-wide">
             Record
           </span>
-          <span className="text-base font-bold">
+          <span className="text-base font-black">
             {wins}-{losses}
           </span>
         </div>
       </div>
 
       {/* Message */}
-      <p className="text-sm text-slate-600 leading-relaxed">{message}</p>
+      {message && (
+        <p className="text-sm text-slate-300 leading-relaxed wrap-break-word min-w-0">
+          {message}
+        </p>
+      )}
     </div>
   );
 };

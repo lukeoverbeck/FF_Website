@@ -21,56 +21,66 @@ const MatchupBar = ({
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem
         value="matchup-1"
-        className="border rounded-xl bg-white shadow-sm overflow-hidden"
+        className={`border rounded-xl bg-white shadow-sm overflow-hidden
+          ${
+            isWin
+              ? "border-l-4 border-l-green-500"
+              : isTie
+              ? "border-l-4 border-l-slate-400"
+              : "border-l-4 border-l-red-400"
+          }
+        `}
       >
-        <AccordionTrigger className="hover:no-underline py-6 px-6">
+        <AccordionTrigger className="hover:no-underline py-5 px-6">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full">
-            {/* Week + W/L Section */}
-            <div className="justify-self-start flex items-center justify-center gap-10">
-              <span className="text-xl font-bold">Week {week}</span>
+            {/* Week + W/L */}
+            <div className="justify-self-start flex items-center gap-6">
+              <span className="text-base font-bold text-navy">Week {week}</span>
               <span
-                className={`text-xl font-bold uppercase px-2 py-0.5 ${
+                className={`text-sm font-bold uppercase px-2 py-0.5 rounded ${
                   isWin
-                    ? "text-green-700"
+                    ? "text-green-700 bg-green-50"
                     : isTie
-                    ? "text-slate-700"
-                    : "text-red-700"
+                    ? "text-slate-600 bg-slate-100"
+                    : "text-red-600 bg-red-50"
                 }`}
               >
                 {isWin ? "W" : isTie ? "T" : "L"}
               </span>
             </div>
 
-            {/* Opponent Section */}
-            <div className="justify-self-center flex items-center justify-center gap-1">
-              <span className="text-sm font-semibold lowercase tracking-wider text-muted-foreground">
+            {/* Opponent */}
+            <div className="justify-self-center flex items-center gap-1">
+              <span className="text-xs font-semibold lowercase tracking-wider text-slate-400">
                 vs.
               </span>
-              <span className="text-lg font-bold">{opponentName}</span>
+              <span className="text-base font-bold text-navy">
+                {opponentName}
+              </span>
             </div>
 
-            {/* Score & Status Section */}
+            {/* Score */}
             <div className="justify-self-end">
               <div className="flex items-baseline gap-2 pr-4">
                 <span
-                  className={`text-2xl font-black ${
+                  className={`font-black ${
                     isWin
-                      ? "text-3xl text-green-700"
+                      ? "text-2xl text-green-700"
                       : isTie
-                      ? "text-slate-900"
-                      : "text-slate-500"
+                      ? "text-xl text-navy"
+                      : "text-xl text-slate-400"
                   }`}
                 >
                   {userScore.toFixed(2)}
                 </span>
-                <span className="text-xl font-bold text-slate-400">-</span>
+                <span className="text-lg font-bold text-slate-300">–</span>
                 <span
-                  className={`text-2xl font-black ${
+                  className={`font-black ${
                     isWin
-                      ? "text-slate-500"
+                      ? "text-xl text-slate-400"
                       : isTie
-                      ? "text-slate-900"
-                      : "text-3xl text-red-700"
+                      ? "text-xl text-navy"
+                      : "text-2xl text-red-600"
                   }`}
                 >
                   {opponentScore.toFixed(2)}
@@ -81,7 +91,6 @@ const MatchupBar = ({
         </AccordionTrigger>
 
         <AccordionContent className="overflow-hidden">
-          {/* Pass the player information to the MatchupDropdown component here */}
           <div className="border-t bg-slate-50/50 p-6">
             <MatchupDropdown
               userPlayers={userPlayers}

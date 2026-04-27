@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const UserInfo = ({
@@ -17,43 +11,46 @@ const UserInfo = ({
   ...props
 }) => {
   const formattedNicknames = playerNicknames
+    // 1. Filter out entries where both nickname and name are missing
+    .filter((item) => item.nickname || item.full_name)
+    // 2. Format the remaining valid entries
     .map((item) => `${item.nickname} (${item.full_name})`)
+    // 3. Join them into a single string
     .join(", ");
-
   const formattedAwards = awardsWon
     .map((item) => `${item.award} (${item.year})`)
     .join(", ");
 
   return (
-    /* 1. h-full on the Card ensures it matches the grid cell height */
-    <Card className="h-full">
-      {/* 2. flex-1 and h-full on CardContent ensures the background/padding fills the Card */}
+    <Card className="h-full border-t-4 border-gold shadow-sm">
       <CardContent className="flex flex-col h-full justify-center gap-6 p-6">
+        {/* Avatar + name row */}
         <div className="flex items-center gap-4">
-          <Avatar className="h-20 w-20 border-2">
+          <Avatar className="h-20 w-20 border-2 border-navy">
             <AvatarImage src={profilePicture} alt="User Profile" />
-            <AvatarFallback>
+            <AvatarFallback className="bg-navy text-white font-bold">
               {displayName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">{teamName}</span>
-            <span className="text-[10px] font-bold text-muted-foreground tracking-wider mt-1">
+            <span className="text-base font-bold text-navy">{teamName}</span>
+            <span className="text-xs font-bold text-slate-400 tracking-widest uppercase mt-1">
               {displayName}
             </span>
           </div>
         </div>
 
-        {/* 3. Using mt-auto here would push this section to the bottom if desired */}
+        {/* Details */}
         <div className="flex flex-col gap-3 text-sm">
           <div>
-            <span className="font-bold">Player Nicknames Created: </span>
-            {formattedNicknames || "None"}
+            <span className="font-bold text-navy">Player Nicknames: </span>
+            <span className="text-slate-600">
+              {formattedNicknames || "None"}
+            </span>
           </div>
           <div>
-            <span className="font-bold">Awards Won: </span>
-            {formattedAwards || "None"}
+            <span className="font-bold text-navy">Awards Won: </span>
+            <span className="text-slate-600">{formattedAwards || "None"}</span>
           </div>
         </div>
       </CardContent>

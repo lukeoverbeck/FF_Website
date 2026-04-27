@@ -1,10 +1,9 @@
-import SettingsCard from "../components/SettingsCard";
-import WinnerCard from "../components/WinnerCard";
 import footballImage from "../assets/football.jpg";
 import { useState, useEffect, memo } from "react";
 import { authFetch, logToBackend } from "../lib/utils";
 import ManagerHighlight from "../components/ManagerHighlight";
 import SkeletonCard from "../components/SkeletonCard";
+import SettingsCard from "../components/SettingsCard";
 
 const settingsConfig = {
   num_teams: { label: "Number of Teams", formatter: (val) => val },
@@ -16,10 +15,13 @@ const settingsConfig = {
     label: "Waiver System",
     formatter: (val) => (val ? "FAAB ($100)" : "Rolling Waivers"),
   },
-  scoring_type: { label: "Scoring System", formatter: (val) => val },
+  scoring_type: {
+    label: "Scoring System",
+    formatter: (val) => val,
+  },
 };
 
-const Home = memo(({ year }) => {
+const Home = memo(({ year, currentRosterId }) => {
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
   const [highlight, setHighlight] = useState(null);
@@ -43,30 +45,28 @@ const Home = memo(({ year }) => {
         return res.json();
       })
       .then((data) => {
+        // ... (settings mapping remains the same)
         const filteredSettingsKeys = Object.keys(data.settings).filter(
           (key) => key !== "season"
         );
-
         const formattedSettingsArray = filteredSettingsKeys.map((key) => {
           const config = settingsConfig[key];
           return {
             id: key,
-            settingsName: config?.label || key, // Use label, fallback to key
+            settingsName: config?.label || key,
             settingsContent:
               config?.formatter(data.settings[key]) || data.settings[key],
           };
         });
 
-        const formattedWinnersArray = data.league_winners.map((winner) => {
-          return {
-            id: winner.season,
-            displayName: winner.display_name,
-            teamName: winner.team_name,
-            year: winner.season,
-            wins: winner.wins,
-            losses: winner.losses,
-          };
-        });
+        const formattedWinnersArray = data.league_winners.map((winner) => ({
+          id: winner.season,
+          displayName: winner.display_name,
+          teamName: winner.team_name,
+          year: winner.season,
+          wins: winner.wins,
+          losses: winner.losses,
+        }));
 
         setSettingsCards(formattedSettingsArray);
         setWinnersCards(formattedWinnersArray);
@@ -99,75 +99,139 @@ const Home = memo(({ year }) => {
   }
 
   return (
-    <>
-      <main className="min-h-screen bg-slate-100">
-        {/* This div keeps everything centered and bounded */}
-        <div className="container mx-auto p-6 space-y-8">
-          {/* Intro section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch bg-white p-6 rounded-xl shadow">
-            {/* Left Column: Text */}
-            <div className="flex flex-col p-6 rounded-lg gap-2">
-              <h1 className="text-3xl font-bold">
-                Welcome to the Game of Inches Fantasy Home Page!
-              </h1>
-              <p className="text-slate-600 leading-relaxed">
-                This is the site for everything about the Game of Inches fantasy
-                football league.
-              </p>
-            </div>
+    <main className="min-h-screen bg-slate-100">
+      {/* ── HERO ── */}
+      <div className="relative overflow-hidden min-h-64 bg-linear-to-br from-navy via-navy-light to-navy">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gold" />
+        <img
+          src={footballImage}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-10 mix-blend-luminosity"
+        />
+        <div className="relative z-10 container mx-auto px-6 py-14">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight max-w-xl mb-3">
+            Game of Inches
+          </h1>
+          <p className="text-slate-400 text-sm leading-relaxed max-w-md">
+            The official hub for everything regarding the Game of Inches fantasy
+            football league.
+          </p>
+        </div>
+      </div>
 
-            {/* Right Column: Image */}
-            <figure className="overflow-hidden rounded-xl h-64 md:h-full">
-              <img
-                src={footballImage}
-                alt="Fantasy Football League"
-                className="w-full h-full object-cover"
-              />
-            </figure>
-          </div>
-
-          <div className="grid grid-cols-12 gap-6">
+      <div className="container mx-auto px-6 py-8 space-y-8">
+        {/* ── LEAGUE SETTINGS ── */}
+        <section>
+          <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">
+            League Settings
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {isLoading ? (
               <>
-                <SkeletonCard className="col-span-12 md:col-span-3" />
-                <SkeletonCard className="col-span-12 md:col-span-3" />
-                <SkeletonCard className="col-span-12 md:col-span-3" />
-                <SkeletonCard className="col-span-12 md:col-span-3" />
+                <SkeletonCard className="h-24" />
+                <SkeletonCard className="h-24" />
+                <SkeletonCard className="h-24" />
+                <SkeletonCard className="h-24" />
               </>
             ) : (
               settingsCards.map((card) => (
-                <SettingsCard
-                  key={card.id}
-                  className="col-span-12 md:col-span-3 shadow"
-                  {...card}
-                />
+                <SettingsCard key={card.id} {...card} />
               ))
             )}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch rounded-xl">
-            <div className="col-span-2 md:col-span-1 flex flex-col gap-5">
+        </section>
+
+        {/* ── LEAGUE HISTORY ── */}
+        <section>
+          <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">
+            League History
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="flex flex-col gap-3">
               {isLoading ? (
                 <>
-                  <SkeletonCard className="h-24" />
-                  <SkeletonCard className="h-24" />
-                  <SkeletonCard className="h-24" />
-                  <SkeletonCard className="h-24" />
+                  <SkeletonCard className="h-20" />
+                  <SkeletonCard className="h-20" />
+                  <SkeletonCard className="h-20" />
+                  <SkeletonCard className="h-20" />
                 </>
               ) : (
-                winnersCards.map((card) => (
-                  <WinnerCard
-                    key={card.id} // Use the season/year as the unique key
-                    className="col-span-2 md:col-span-1 shadow"
-                    {...card}
-                  />
-                ))
+                winnersCards.map((card) => {
+                  // NEW LOGIC: Compare card year to the prop year
+                  const isCurrentYearWinner = card.year === Number(year);
+
+                  return (
+                    <div
+                      key={card.id}
+                      className={`
+                        bg-white rounded-xl shadow-sm flex items-center gap-4 p-4
+                        ${
+                          isCurrentYearWinner
+                            ? "border-l-4 border-gold ring-1 ring-slate-200"
+                            : "border border-slate-200"
+                        }
+                      `}
+                    >
+                      {/* Year badge */}
+                      <div
+                        className={`min-w-14 text-center rounded-lg py-1.5 ${
+                          isCurrentYearWinner ? "bg-navy" : "bg-slate-100"
+                        }`}
+                      >
+                        <p
+                          className={`text-sm font-extrabold ${
+                            isCurrentYearWinner ? "text-gold" : "text-slate-500"
+                          }`}
+                        >
+                          {card.year}
+                        </p>
+                      </div>
+
+                      {/* Name + team */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-navy text-sm">
+                          {isCurrentYearWinner && (
+                            <span className="text-gold">🏆 </span>
+                          )}
+                          {card.displayName}
+                        </p>
+                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide truncate">
+                          {card.teamName}
+                        </p>
+                      </div>
+
+                      {/* Record */}
+                      <div className="text-right shrink-0">
+                        <p className="font-extrabold text-base text-navy">
+                          {card.wins}–{card.losses}
+                        </p>
+                        <p className="text-xs text-slate-400 font-medium">
+                          W – L
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
-            <ManagerHighlight highlight={highlight} />
+
+            {/* Manager Spotlight */}
+            {isLoading ? (
+              <SkeletonCard className="h-80" />
+            ) : (
+              <div className="bg-linear-to-br from-navy to-navy-light rounded-xl shadow-lg p-7 h-full">
+                <p className="text-xs font-bold tracking-widest text-gold uppercase mb-5">
+                  Manager Spotlight
+                </p>
+                <ManagerHighlight highlight={highlight} />
+              </div>
+            )}
           </div>
-        </div>
-      </main>
-    </>
+        </section>
+      </div>
+    </main>
   );
 });
 

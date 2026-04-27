@@ -63,6 +63,7 @@ class RichRoster(BigQueryModel):
     # If the column is empty in BigQuery, the API returns [] instead of null
     player_details: list[RichRosterRecord] = Field(default_factory=list)
     profile_picture: Optional[str]
+    is_winner: bool
 
 class ManagerHighlight(BigQueryModel):
     display_name: str
@@ -70,6 +71,7 @@ class ManagerHighlight(BigQueryModel):
     wins: int
     losses: int
     message: str
+    profile_picture: Optional[str]
 
 # Home dashboard model
 class HomeDashboard(BigQueryModel):
@@ -103,6 +105,7 @@ class Managers(BigQueryModel):
     team_name: str
     total_wins: int
     total_losses: int
+    profile_picture: Optional[str]
 
 class Navbar(BigQueryModel):
     display_name: str
