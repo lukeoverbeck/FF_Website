@@ -9,6 +9,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "../lib/utils";
 
+// ─────────────────────────────────────────────
+// WinnerCard
+// Presentational card for a single season champion. Displays the season year as a header, followed by
+// the winner's avatar, display name, team name, and win-loss record. Intended for use in league history
+// lists where each past champion gets its own card.
+// ─────────────────────────────────────────────
 const WinnerCard = ({
   className,
   displayName,

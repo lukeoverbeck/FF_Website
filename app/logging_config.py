@@ -2,6 +2,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
+# ─────────────────────────────────────────────
+# logging_config.py
+# Configures and returns the shared "fantasy_api" logger used throughout main.py. Attaches two
+# handlers: a RotatingFileHandler that writes to logs/app.log (capped at 5 MB, 3 backups kept)
+# and a StreamHandler for console output during development. The logs/ directory is created
+# automatically if it does not already exist.
+# ─────────────────────────────────────────────
+
 # Create a logs directory if it doesn't exist
 if not os.path.exists('logs'):
     os.makedirs('logs')

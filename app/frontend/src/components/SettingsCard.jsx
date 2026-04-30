@@ -2,6 +2,12 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import { cn } from "../lib/utils";
 
+// ─────────────────────────────────────────────
+// SettingsCard
+// Presentational card for a single league setting. Renders a gold top-border Card with a muted uppercase
+// label (settingsName) and a bold value (settingsContent). Used in the Home page settings grid; content is
+// pre-formatted by settingsConfig before being passed in.
+// ─────────────────────────────────────────────
 const SettingsCard = ({
   className,
   settingsName,

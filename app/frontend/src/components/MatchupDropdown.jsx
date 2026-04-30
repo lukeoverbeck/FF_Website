@@ -7,6 +7,15 @@ import {
   TableRow,
 } from "./ui/table";
 
+// ─────────────────────────────────────────────
+// MatchupDropdown
+// Detailed side-by-side player table rendered inside an expanded MatchupBar. Receives raw player arrays
+// for both teams and splits each into starters and bench before rendering. Displays a mirrored table layout:
+// user players on the left, opponent on the right, with the fantasy position slot in the center column.
+// ─────────────────────────────────────────────
+// ── LINEUP_SLOTS: canonical starter slot order ──
+// Used to assign players to specific positional slots by matching each player's fantasy_pos against this
+// ordered list. Unmatched slots render an empty placeholder.
 const LINEUP_SLOTS = [
   "QB",
   "RB",
@@ -27,6 +36,11 @@ const MatchupDropdown = ({
   isWin,
   isTie,
 }) => {
+  // ── splitIntoStartersAndBench ──
+  // Iterates LINEUP_SLOTS in order, greedily matching the first
+  // available player whose fantasy_pos fits each slot. Matched
+  // players are spliced out of the working copy so they can't be
+  // double-assigned. Any remaining players become the bench array.
   const splitIntoStartersAndBench = (players) => {
     const unassigned = [...players];
     const starters = [];
@@ -56,6 +70,9 @@ const MatchupDropdown = ({
   const { starters: opponentStarters, bench: opponentBench } =
     splitIntoStartersAndBench(opponentPlayers);
 
+  // ── Bench pairing: zip both bench arrays by index ──
+  // Pads the shorter side with empty slot placeholders so
+  // every bench row always has both a user and opponent cell.
   const longestBench = Math.max(userBench.length, opponentBench.length);
   const benchMatchups = Array.from({ length: longestBench }, (_, i) => ({
     userBenchPlayer: userBench[i] || {
@@ -72,6 +89,9 @@ const MatchupDropdown = ({
     },
   }));
 
+  // ── renderMatchupRow ──
+  // Shared row renderer for both starters and bench sections.
+  // Empty slots ("none") render italicised placeholder text instead of a name and show 0.00 in a muted style.
   const renderMatchupRow = (userPlayer, opponentPlayer, slotLabel, rowKey) => {
     const userIsEmpty = userPlayer.name.toLowerCase() === "none";
     const opponentIsEmpty = opponentPlayer.name.toLowerCase() === "none";
@@ -142,6 +162,7 @@ const MatchupDropdown = ({
     );
   };
 
+  // ── Render: starters table → total score row → bench divider → bench rows ──
   return (
     <div className="w-full">
       <Table>

@@ -3,6 +3,17 @@
 @plugin "tailwindcss-animate"; /* Provides animation classes that make shadcn components feel smooth */
 @custom-variant dark (&:is(.dark *)); /* Makes it so that any element with the .dark class will apply dark mode styles to all its children. This is useful for components that need to support both light and dark themes. */
 
+/*
+  ─────────────────────────────────────────────
+  Design Token System
+  All colors and radii are defined as OKLCH CSS variables on :root and overridden inside .dark.
+  Variables use semantic names (--background, --primary) rather than raw color values so the
+  entire palette can shift by swapping a single :root block. The @theme inline section below
+  maps each variable to a Tailwind utility class (bg-*, text-*, border-*, etc.) so tokens are
+  usable directly in JSX className strings.
+  ─────────────────────────────────────────────
+*/
+
 :root {
   /* Shadcn Core Variables */
   /* OKLCH Format: Lightness (0-1), Chroma (Intensity), Hue (0-360) */

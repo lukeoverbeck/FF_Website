@@ -5,6 +5,16 @@ import ManagerHighlight from "../components/ManagerHighlight";
 import SkeletonCard from "../components/SkeletonCard";
 import SettingsCard from "../components/SettingsCard";
 
+// ─────────────────────────────────────────────
+// settingsConfig
+// Static display map for league settings keys
+// returned by the API. Each entry defines a
+// human-readable label and an optional formatter
+// that converts raw API values (booleans, strings)
+// into the copy shown in the SettingsCard grid.
+// Keys not present here fall back to the raw key
+// name and raw value.
+// ─────────────────────────────────────────────
 const settingsConfig = {
   num_teams: { label: "Number of Teams", formatter: (val) => val },
   is_keeper: {
@@ -21,13 +31,30 @@ const settingsConfig = {
   },
 };
 
-const Home = memo(({ year, currentRosterId }) => {
+// ─────────────────────────────────────────────
+// Home
+// Primary landing page for authenticated users.
+// Fetches /api/home_dashboard/{year} on mount (and whenever year changes) and renders three sections:
+//   • League Settings  – four SettingsCards in a grid
+//   • League History   – per-season winner list with
+//                        current-year gold highlighting
+//   • Manager Spotlight – ManagerHighlight card driven
+//                        by the commissioner-curated highlight
+// Wrapped in memo to skip re-renders when year and currentRosterId props are unchanged.
+// ─────────────────────────────────────────────
+const Home = memo(({ year }) => {
+  // ── Component state ──
+  // settingsCards  – formatted array for the SettingsCard grid
+  // winnersCards   – formatted array for the league history list
+  // highlight      – manager spotlight object from the API
   const [settingsCards, setSettingsCards] = useState([]);
   const [winnersCards, setWinnersCards] = useState([]);
   const [highlight, setHighlight] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ── Data fetch: re-runs whenever the selected year changes ──
+  // Transforms the raw API response into the three card arrays used by the render sections below.
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -45,7 +72,6 @@ const Home = memo(({ year, currentRosterId }) => {
         return res.json();
       })
       .then((data) => {
-        // ... (settings mapping remains the same)
         const filteredSettingsKeys = Object.keys(data.settings).filter(
           (key) => key !== "season"
         );
@@ -83,6 +109,7 @@ const Home = memo(({ year, currentRosterId }) => {
       });
   }, [year]);
 
+  // ── Full-page error state ──
   if (error) {
     return (
       <main className="min-h-screen bg-slate-100">
@@ -121,7 +148,9 @@ const Home = memo(({ year, currentRosterId }) => {
       </div>
 
       <div className="container mx-auto px-6 py-8 space-y-8">
-        {/* ── LEAGUE SETTINGS ── */}
+        {/* ── LEAGUE SETTINGS ──
+            Four SettingsCards in a 2×2 / 1×4 responsive grid.
+            Replaced by SkeletonCards while data is loading. */}
         <section>
           <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">
             League Settings
@@ -142,7 +171,13 @@ const Home = memo(({ year, currentRosterId }) => {
           </div>
         </section>
 
-        {/* ── LEAGUE HISTORY ── */}
+        {/* ── LEAGUE HISTORY ──
+            Left column: chronological winner list. The card matching
+            the currently selected year receives gold border + trophy
+            treatment to distinguish the active champion.
+            Right column: Manager Spotlight card powered by the
+            commissioner-set highlight object. Both columns swap to
+            SkeletonCards while loading. */}
         <section>
           <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">
             League History
@@ -159,7 +194,6 @@ const Home = memo(({ year, currentRosterId }) => {
                 </>
               ) : (
                 winnersCards.map((card) => {
-                  // NEW LOGIC: Compare card year to the prop year
                   const isCurrentYearWinner = card.year === Number(year);
 
                   return (

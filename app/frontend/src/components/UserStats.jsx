@@ -3,6 +3,14 @@ import { Card, CardContent } from "./ui/card";
 
 const leagueMedianYears = ["2024", "2025"];
 
+// ─────────────────────────────────────────────
+// UserStats
+// Season statistics card for the User Dashboard. Renders overall, H2H, and league median records at
+// the top, then a rank + points section below. The layout switches from a two-column to a three-column
+// grid when isWinner is true, inserting a gold trophy badge between the rank and points columns.
+// H2H and league median rows are conditionally shown based on leagueMedianYears, since that scoring system
+// was not tracked in earlier seasons.
+// ─────────────────────────────────────────────
 const UserStats = ({
   totalRecord,
   headToHeadRecord,
