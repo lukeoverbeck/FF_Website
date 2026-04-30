@@ -2,6 +2,12 @@ import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
+// ─────────────────────────────────────────────
+// UserInfo
+// Identity card for the User Dashboard. Displays the manager's avatar, team name, and display name, followed
+// by two derived detail rows: player nicknames and awards won. Both lists are formatted from their raw arrays
+// into comma-separated strings before rendering, falling back to "None" when the arrays are empty.
+// ─────────────────────────────────────────────
 const UserInfo = ({
   teamName,
   displayName,

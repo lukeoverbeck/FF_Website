@@ -13,6 +13,14 @@ import time
 from logging_config import logger
 import uuid
 
+# ─────────────────────────────────────────────
+# main.py
+# FastAPI application entry point. Defines all API endpoints consumed by the React frontend, backed by
+# BigQuery gold-layer tables. Every protected route passes through require_auth (JWT verification);
+# commissioner-only routes additionally pass through require_commissioner. All queries use parameterized
+# inputs to prevent injection, and GoogleCloudErrors are caught and surfaced as 503s.
+# ─────────────────────────────────────────────
+
 app = FastAPI()
 client = bigquery.Client()
 load_dotenv()
@@ -28,6 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── HTTP middleware: request logger ──
+# Runs on every inbound request. Assigns a short random request ID and logs method, path, status
+# code, and processing time in milliseconds.
 # This endpoint will be hit every time the frontend makes an API call
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -51,6 +62,10 @@ async def log_requests(request: Request, call_next):
     
     return response
 
+# ── Auth dependency: require_auth ──
+# Decodes and validates the Bearer JWT on every
+# protected request. Returns the decoded payload
+# (contains sub and role) so endpoints can log the acting user. Raises 401 on expiry or malformed tokens.
 def require_auth(auth: HTTPAuthorizationCredentials = Depends(security)):
     try:
         token = auth.credentials
@@ -67,12 +82,18 @@ def require_auth(auth: HTTPAuthorizationCredentials = Depends(security)):
         logger.error(f"Auth failed: unexpected error — {e}", exc_info=True)
         raise HTTPException(status_code=401, detail="Not authenticated")
 
+# ── Auth dependency: require_commissioner ──
+# Extends require_auth with a role check.
+# Returns 403 if the authenticated user is not a commissioner.
 def require_commissioner(auth: HTTPAuthorizationCredentials = Depends(security)):
     payload = require_auth(auth)
     if payload.get("role") != "commissioner":
         raise HTTPException(status_code=403, detail="Forbidden")
     return payload
 
+# ── GET /api/navbar/{roster_id}/{season} ──
+# Returns the display name, team name, and profile picture
+# for the logged-in user to populate the Navbar component.
 @app.get("/api/navbar/{roster_id}/{season}", response_model=Navbar)
 async def get_navbar(roster_id: int, season: int,  user=Depends(require_auth)):
     logger.info(f"Fetching navbar for roster_id={roster_id}, season={season}, user={user['sub']}")
@@ -100,6 +121,12 @@ async def get_navbar(roster_id: int, season: int,  user=Depends(require_auth)):
         logger.error(f"BigQuery error for roster_id={roster_id}, season={season} — {e}", exc_info=True)
         raise HTTPException(status_code=503, detail=f"Failed to fetch navbar data")
 
+# ── GET /api/home_dashboard/{season} ──
+# Fans out three sequential BigQuery queries:
+#   1. league_settings  – single row for the given season
+#   2. league_winners   – all rows, ordered DESC by season
+#   3. current_highlight – single commissioner-set spotlight row
+# Returns the combined HomeDashboard model.
 # Home dashboard endpoint - combines league settings and league winners for a given season
 @app.get("/api/home_dashboard/{season}", response_model=HomeDashboard)
 async def get_home_dashboard(season: int, user=Depends(require_auth)):
@@ -163,6 +190,15 @@ async def get_home_dashboard(season: int, user=Depends(require_auth)):
         "manager_highlight": highlight
     }
 
+# ── GET /api/user_dashboard/{season}/{roster_id} ──
+# Fans out three sequential BigQuery queries:
+#   1. rich_rosters      – single roster row for the manager
+#   2. matchup_bar       – all weekly matchup summaries; CASE
+#                          statements normalize team_a/team_b so
+#                          the user is always on the "user" side
+#   3. matchup_dropdown  – all player-level rows for the season,
+#                          then split client-side by week and roster_id
+# The three result sets are zipped into a list of MatchupEntry objects and returned as the UserDashboard model.
 @app.get("/api/user_dashboard/{season}/{roster_id}", response_model=UserDashboard)
 async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_auth)):
     logger.info(f"Fetching user dashboard for roster_id={roster_id}, season={season}, user={user['sub']}")
@@ -267,6 +303,8 @@ async def get_user_dashboard(season: int, roster_id: int, user=Depends(require_a
         "matchups": combined_matchups
     }
 
+# ── POST /api/login ──
+# Looks up the username in BigQuery, verifies the submitted password against the stored bcrypt hash, then issues a signed HS256 JWT containing the user's sub and role. Token expires after 8 hours.
 @app.post("/api/login")
 def login(body: LoginRequest):
     password_query = """

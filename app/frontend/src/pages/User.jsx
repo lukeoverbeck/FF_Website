@@ -6,13 +6,32 @@ import { authFetch, logToBackend } from "../lib/utils";
 import SkeletonCard from "../components/SkeletonCard";
 import footballImage from "../assets/football.jpg";
 
+// ─────────────────────────────────────────────
+// User
+// Per-manager dashboard page. Fetches /api/user_dashboard/{year}/{currentRosterId}
+// whenever year or currentRosterId changes and renders three distinct content areas:
+//   • UserInfo    – avatar, team name, player nicknames
+//   • UserStats   – season record, rank, points for/against
+//   • Matchups    – scrollable list of MatchupBar rows,
+//                  one per regular-season week
+// Wrapped in memo to avoid unnecessary re-renders when unrelated parent state updates.
+// ─────────────────────────────────────────────
 const User = memo(({ year, currentRosterId }) => {
+  // ── Component state ──
+  // userInfo      – identity/roster data for the UserInfo card
+  // userStats     – aggregate season stats for the UserStats card
+  // matchupsData  – week-by-week matchup array for MatchupBar rows
   const [userInfo, setUserInfo] = useState([]);
   const [userStats, setUserStats] = useState([]);
   const [matchupsData, setMatchupsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ── Data fetch: re-runs on year or roster ID change ──
+  // Skips the request entirely if currentRosterId is not yet
+  // available. On success, shapes the raw API payload into the
+  // three state objects consumed by child components.
+  // Network and API errors are captured in state and logged.
   useEffect(() => {
     if (!currentRosterId) return;
     setIsLoading(true);
@@ -51,6 +70,11 @@ const User = memo(({ year, currentRosterId }) => {
           isWinner: user.is_winner,
         });
 
+        // ── Matchup data transformation ──
+        // Each matchup is split into a summary (week, scores,
+        // opponent name) and two player-detail arrays (user team
+        // and opponent team) that MatchupBar uses for its
+        // expandable roster breakdown.
         const formattedMatchupsArray = data.matchups.map((matchup) => {
           const innerUserMatchup = matchup.details.user_team.map((player) => ({
             pos: player.position,
@@ -95,6 +119,7 @@ const User = memo(({ year, currentRosterId }) => {
       });
   }, [year, currentRosterId]);
 
+  // ── Full-page error state ──
   if (error) {
     return (
       <main className="min-h-screen bg-slate-100">
@@ -110,6 +135,12 @@ const User = memo(({ year, currentRosterId }) => {
     );
   }
 
+  // ── Render ──
+  // Hero banner is shared styling with Home and Commissioner.
+  // While loading, SkeletonCards placeholder the info/stats pair
+  // and 14 skeleton rows stand in for the matchup list.
+  // Once loaded, UserInfo and UserStats render side-by-side,
+  // followed by a MatchupBar for each week in matchupsData.
   return (
     <main className="min-h-screen bg-slate-100">
       {/* Hero Section */}

@@ -1,5 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
+// ─────────────────────────────────────────────
+// ManagerHighlight
+// Displays the commissioner-curated spotlight inside the Home page's Manager Spotlight card. Renders an
+// avatar, display name, team name, season record badge, and an optional free-text message. If highlight is
+// null (data still loading), shows a pulse skeleton.
+// ─────────────────────────────────────────────
 const ManagerHighlight = ({ highlight }) => {
   if (!highlight)
     return <div className="animate-pulse bg-white/10 h-40 rounded-lg" />;

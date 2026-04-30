@@ -2,7 +2,19 @@ import { useState, useEffect } from "react";
 import { authFetch, logToBackend } from "../lib/utils";
 import footballImage from "../assets/football.jpg";
 
+// ─────────────────────────────────────────────
+// Commissioner
+// Admin-only portal for curating the Manager Highlight that appears on the Home page.
+// On mount, fetches the full 2025 manager roster from /api/managers/2025 and populates a dropdown.
+// Selecting a manager auto-fills their team name and season record; the commissioner then writes
+// a custom message before saving the highlight to /api/manager_highlight via POST.
+// ─────────────────────────────────────────────
 const Commissioner = () => {
+  // ── Component state ──
+  // managers       – full roster fetched on mount
+  // selectedManager – the manager object chosen in the dropdown
+  // message        – commissioner-authored spotlight text
+  // saveStatus     – success/error feedback after a save attempt
   const [managers, setManagers] = useState([]);
   const [selectedManager, setSelectedManager] = useState(null);
   const [message, setMessage] = useState("");
@@ -11,6 +23,7 @@ const Commissioner = () => {
   const [saveStatus, setSaveStatus] = useState(null);
   const [error, setError] = useState(null);
 
+  // ── Data fetch on mount: load all managers for the 2025 (most recent) season ──
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -34,6 +47,7 @@ const Commissioner = () => {
       });
   }, []);
 
+  // ── Full-page error state: shown when the initial fetch fails ──
   if (error) {
     return (
       <main className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-6">
@@ -47,6 +61,9 @@ const Commissioner = () => {
     );
   }
 
+  // ── Dropdown change handler ──
+  // Looks up the matching manager object by display_name
+  // and resets any prior save status feedback.
   const handleManagerSelect = (e) => {
     const displayName = e.target.value;
     if (!displayName) {
@@ -58,6 +75,10 @@ const Commissioner = () => {
     setSaveStatus(null);
   };
 
+  // ── Save handler ──
+  // POSTs the selected manager's data and custom message
+  // to /api/manager_highlight. Clears all fields on success
+  // and surfaces a typed saveStatus banner for both outcomes.
   const handleSave = async () => {
     if (!selectedManager) return;
     setIsSaving(true);
@@ -103,6 +124,15 @@ const Commissioner = () => {
     }
   };
 
+  // ── Render ──
+  // Hero banner mirrors the style used across other pages.
+  // The form card contains four fields:
+  //   1. Manager dropdown (user-controlled)
+  //   2. Team name (read-only, auto-populated)
+  //   3. Season record (read-only, auto-populated)
+  //   4. Message textarea (user-controlled)
+  // Save button is disabled until a manager is selected
+  // or while a save request is in-flight.
   return (
     <main className="min-h-screen bg-slate-100 flex flex-col">
       <div className="relative overflow-hidden min-h-64 bg-linear-to-br from-navy via-navy-light to-navy">

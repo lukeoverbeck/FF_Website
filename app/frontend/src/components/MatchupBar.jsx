@@ -6,6 +6,13 @@ import {
 } from "./ui/accordion";
 import MatchupDropdown from "./MatchupDropdown";
 
+// ─────────────────────────────────────────────
+// MatchupBar
+// Collapsible row representing a single week's matchup result. The trigger row shows the week
+// number, a W/L/T badge, the opponent's name, and both scores. A left border color (green/red/grey)
+// provides an at-a-glance win/loss/tie indicator. Expanding the accordion mounts MatchupDropdown
+// with the full player-level breakdown for both sides.
+// ─────────────────────────────────────────────
 const MatchupBar = ({
   userScore,
   opponentScore,
@@ -31,6 +38,7 @@ const MatchupBar = ({
           }
         `}
       >
+        {/* ── Trigger row: week label, W/L/T badge, opponent, scores ── */}
         <AccordionTrigger className="hover:no-underline py-5 px-6">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full">
             {/* Week + W/L */}
@@ -90,6 +98,7 @@ const MatchupBar = ({
           </div>
         </AccordionTrigger>
 
+        {/* ── Expanded content: player-level breakdown via MatchupDropdown ── */}
         <AccordionContent className="overflow-hidden">
           <div className="border-t bg-slate-50/50 p-6">
             <MatchupDropdown

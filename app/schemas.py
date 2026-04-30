@@ -1,9 +1,16 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import List, Optional
 
+# ── BigQueryModel ──
+# Base class for all Pydantic models in this file. Sets from_attributes=True once so every subclass can
+# be constructed directly from BigQuery RowIterator rows without repeating the model_config declaration.
 # Write model_config once
 class BigQueryModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+
+# ── Flat gold-layer models ──
+# One-to-one representations of individual BigQuery gold-layer
+# tables. Each is used as a response_model (or nested field) in the FastAPI endpoints defined in main.py.
 
 # General gold layer model
 class LeagueSettings(BigQueryModel):
@@ -73,6 +80,10 @@ class ManagerHighlight(BigQueryModel):
     message: str
     profile_picture: Optional[str]
 
+# ── Composite response models ──
+# Aggregate the flat models above into the shapes returned by the /api/home_dashboard and
+# /api/user_dashboard endpoints.
+
 # Home dashboard model
 class HomeDashboard(BigQueryModel):
     # Not a list because it is for a singular year
@@ -95,6 +106,9 @@ class MatchupEntry(BigQueryModel):
 class UserDashboard(BigQueryModel):
     roster_info: RichRoster
     matchups: list[MatchupEntry]
+
+# ── Utility models ──
+# Lightweight models for auth, navigation, and logging endpoints that don't map directly to gold-layer tables.
 
 class LoginRequest(BigQueryModel):
     username: str

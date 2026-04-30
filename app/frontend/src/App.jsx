@@ -9,6 +9,9 @@ import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
 
+// ── ProtectedRoute ──
+// Wraps any route that requires authentication. Redirects to /login if no token exists or if the
+// decoded JWT is expired or malformed. On valid tokens, renders children as-is.
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
 
@@ -32,6 +35,9 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// ── CommissionerRoute ──
+// Extends ProtectedRoute with a role check. Authenticated
+// users whose JWT role is not "commissioner" are redirected to /home rather than seeing a 403 error page.
 const CommissionerRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   if (!token) return <Navigate to="/login" />;
@@ -52,12 +58,21 @@ const CommissionerRoute = ({ children }) => {
   return children;
 };
 
+// ── CatchAll ──
+// Handles any unmatched path. Authenticated users land on /home; unauthenticated users are sent to /login.
 const CatchAll = () => {
   const token = localStorage.getItem("token");
   if (token) return <Navigate to="/home" />;
   return <Navigate to="/login" />;
 };
 
+// ─────────────────────────────────────────────
+// App
+// Root component. Owns the three pieces of global state shared across all pages: the selected season
+// year, the auth token, and the current user's roster ID for that year. The roster ID is re-fetched from
+// /api/roster_mapping/{year} whenever year or token changes, ensuring page components always receive a
+// valid rosterId for their data fetches.
+// ─────────────────────────────────────────────
 function App() {
   const [year, setYear] = useState("2025");
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -109,7 +124,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <Home year={year} currentRosterId={rosterId} />
+                <Home year={year} />
               </ProtectedRoute>
             }
           />
@@ -117,7 +132,7 @@ function App() {
             path="/home"
             element={
               <ProtectedRoute>
-                <Home year={year} currentRosterId={rosterId} />
+                <Home year={year} />
               </ProtectedRoute>
             }
           />

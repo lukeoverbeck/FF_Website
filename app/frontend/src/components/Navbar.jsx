@@ -15,6 +15,13 @@ import { authFetch, logToBackend } from "../lib/utils";
 import SkeletonCard from "./SkeletonCard";
 import { jwtDecode } from "jwt-decode";
 
+// ─────────────────────────────────────────────
+// Navbar
+// Persistent top navigation bar rendered on all authenticated pages. Fetches the current user's
+// display name, team name, and profile picture from /api/navbar/{rosterId}/{year} on mount and whenever
+// year or currentRosterId changes. Decodes the stored JWT to determine if the commissioner nav link should
+// be shown. Also owns the sign-out flow and the season year selector that drives year state globally.
+// ─────────────────────────────────────────────
 const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   const navigate = useNavigate();
   const [userCard, setUserCard] = useState({
@@ -24,9 +31,13 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // ── Role check: decode JWT to conditionally render the Commissioner link ──
   const token = localStorage.getItem("token");
   const isCommissioner = token && jwtDecode(token).role === "commissioner";
 
+  // ── Data fetch: re-runs when year or roster ID changes ──
+  // Skips the request until currentRosterId is available.
   useEffect(() => {
     if (!currentRosterId) return; // Don't fetch until we have the roster ID
     setIsLoading(true);
@@ -56,12 +67,18 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
       });
   }, [currentYear, currentRosterId]);
 
+  // ── Sign-out handler: clears token from storage and app state, redirects to login ──
   const handleSignOut = () => {
     localStorage.removeItem("token");
     setToken(null);
     navigate("/login");
   };
 
+  // ── Render: three-column grid layout ──
+  // Left   – icon nav buttons (Home, User Dashboard, Commissioner if applicable)
+  // Center – site title link back to /home
+  // Right  – profile info (team name, display name, avatar), sign-out button,
+  //          and the season year <select> that calls onYearChange on the parent
   return (
     <TooltipProvider delayDuration={300}>
       <nav className="border-b bg-background sticky top-0 z-50">
@@ -187,7 +204,6 @@ const Navbar = ({ currentYear, currentRosterId, onYearChange, setToken }) => {
                   </TooltipContent>
                 </Tooltip>
                 <nav>
-                  {/* 3. Use the setter in your dropdown or buttons */}
                   <select
                     value={currentYear}
                     onChange={(e) => onYearChange(e.target.value)}

@@ -2,13 +2,23 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logToBackend } from "../lib/utils";
 
+// ─────────────────────────────────────────────
+// LoginPage
+// Entry-point authentication screen. Accepts a username/password pair, posts credentials to
+// /api/login, stores the returned JWT in localStorage, and redirects to /home on success.
+// The setToken prop keeps the parent app state in sync so downstream routes stay protected.
+// ─────────────────────────────────────────────
 const LoginPage = ({ setToken }) => {
+  // ── Local form + request state ──
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ── Form submission handler ──
+  // Hits /api/login and handles three distinct outcomes: success (token stored + redirect),
+  // 503 service unavailable, and all other errors. Network-level failures are logged to the backend.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
